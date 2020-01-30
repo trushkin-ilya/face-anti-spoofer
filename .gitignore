@@ -43,3 +43,4 @@ debug*.log
 ptvsd*.log
 pydevd*.log
 nodeLanguageServer/**
+.vscode

@@ -1,6 +1,6 @@
 import os
 from torch.utils.data import Dataset
-from torchvision.transforms import Resize
+from torchvision.transforms import Resize, ToTensor, Compose
 import torch
 from PIL import Image
 
@@ -8,7 +8,7 @@ from PIL import Image
 class MfsdDataset(Dataset):
     """Mfsd dataset."""
 
-    def __init__(self, attack_dir, real_dir, transform=Resize((480, 640))):
+    def __init__(self, attack_dir, real_dir):
         """
         Args:
             dir (string): Directory with all the images.
@@ -22,7 +22,7 @@ class MfsdDataset(Dataset):
         self.images = self.images + [{'image': os.path.join(real_dir, img),
                                       'label': 'live'}
                                      for img in os.listdir(real_dir)]
-        self.transform = transform
+        self.transform = Compose([Resize((480, 640)), ToTensor()])
 
     def __len__(self):
         return len(os.listdir(self.attack_dir)) +\
@@ -34,8 +34,6 @@ class MfsdDataset(Dataset):
 
         img_name = self.images[idx]['image']
         image = Image.open(img_name)
-
-        if self.transform:
-            image = self.transform(image)
+        image = self.transform(image)
 
         return image, self.images[idx]['label']

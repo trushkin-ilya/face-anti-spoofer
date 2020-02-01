@@ -1,18 +1,20 @@
-from datasets import MfsdDataset
+from datasets import CasiaSurfDataset
 from torch.utils.data import DataLoader, SubsetRandomSampler
-from torch.utils import model_zoo
 import numpy as np
 
-if __name__ == '__main__':
-    dataset = MfsdDataset("../data/MFSD/attack/001", "../data/MFSD/real/001")
-    val_q = len(dataset) // 5
-    print(val_q, range(len(dataset)))
+
+def get_loader(dataset, batch_size=64, split=(4, 1)):
+    val_q = len(dataset) // sum(split) * split[1]
 
     val_indices = np.random.choice(list(range(len(dataset))), val_q)
     train_indices = list(set(range(len(dataset))).difference(val_indices))
-    train_loader = DataLoader(
-        dataset, sampler=SubsetRandomSampler(train_indices), batch_size=64)
-    detector = model_zoo.load_url(
-        'https://docs.google.com/uc?export=download&id=1TDZVEBudGaEd5POR5X4ZsMvdsh1h68T1', model_dir='models')
-    for i, batch in train_loader:
-        print(i, batch)
+    sampler = SubsetRandomSampler(train_indices)
+    return DataLoader(dataset, sampler=sampler, batch_size=batch_size)
+
+
+if __name__ == '__main__':
+    dataset = CasiaSurfDataset()
+    data_loader = get_loader(dataset)
+    for images, labels in enumerate(data_loader):
+        print(images, labels)
+        raise

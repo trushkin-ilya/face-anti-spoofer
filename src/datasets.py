@@ -48,7 +48,7 @@ class CasiaSurfDataset(Dataset):
             file_name = f'4@{i}_{txt_metadata}.txt'
             with open(os.path.join(dir, file_name), 'r') as file:
                 lines = file.readlines()
-                self.items += [tuple(line.split(' ')) for line in lines]
+                self.items += [tuple(line[:-1].split(' ')) for line in lines]
         self.transform = Compose([Resize((640, 480)), ToTensor()])
 
     def __len__(self):
@@ -64,4 +64,4 @@ class CasiaSurfDataset(Dataset):
         img = Image.open(img_path)
         img = self.transform(img)
 
-        return img, label
+        return img, int(label)

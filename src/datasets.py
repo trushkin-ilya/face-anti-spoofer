@@ -22,7 +22,7 @@ class MfsdDataset(Dataset):
         self.images = self.images + [{'image': os.path.join(real_dir, img),
                                       'label': 'live'}
                                      for img in os.listdir(real_dir)]
-        self.transform = Compose([Resize((480, 640)), ToTensor()])
+        self.transform = Compose([Resize((320, 240)), ToTensor()])
 
     def __len__(self):
         return len(os.listdir(self.attack_dir)) +\
@@ -40,16 +40,14 @@ class MfsdDataset(Dataset):
 
 
 class CasiaSurfDataset(Dataset):
-    def __init__(self, dir: str = 'data/CASIA_SURF', train: bool = True):
+    def __init__(self, protocol: int, dir: str = 'data/CASIA_SURF', train: bool = True, ):
         txt_metadata = 'train' if train else 'dev_res'
         self.dir = dir
-        self.items = []
-        for i in [1, 2, 3]:
-            file_name = f'4@{i}_{txt_metadata}.txt'
-            with open(os.path.join(dir, file_name), 'r') as file:
-                lines = file.readlines()
-                self.items += [tuple(line[:-1].split(' ')) for line in lines]
-        self.transform = Compose([Resize((640, 480)), ToTensor()])
+        file_name = f'4@{protocol}_{txt_metadata}.txt'
+        with open(os.path.join(dir, file_name), 'r') as file:
+            lines = file.readlines()
+            self.items = [tuple(line[:-1].split(' ')) for line in lines]
+        self.transform = Compose([Resize((320, 240)), ToTensor()])
 
     def __len__(self):
         return len(self.items)

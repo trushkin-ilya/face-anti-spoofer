@@ -44,3 +44,4 @@ ptvsd*.log
 pydevd*.log
 nodeLanguageServer/**
 .vscode
+/data/CASIA_SURF/

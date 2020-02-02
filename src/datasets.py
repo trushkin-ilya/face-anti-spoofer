@@ -26,8 +26,7 @@ class MfsdDataset(Dataset):
         self.transform = Compose([Resize((320, 240)), ToTensor()])
 
     def __len__(self):
-        return len(os.listdir(self.attack_dir)) +\
-            len(os.listdir(self.real_dir))
+        return len(self.items)
 
     def __getitem__(self, idx):
         if torch.is_tensor(idx):

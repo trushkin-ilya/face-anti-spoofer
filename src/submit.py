@@ -35,17 +35,17 @@ The final merged file (for submission) contains a total of 600 lines. Each line 
     argparser.add_argument('--model2_path', type=str, required=True)
     argparser.add_argument('--model3_path', type=str, required=True)
     args = argparser.parse_args()
+
     model = models.mobilenet_v2(num_classes=2)
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
-    model = model.to(device)
     with open('submission.txt', 'w+') as submission:
         for protocol in [1, 2, 3]:
             model.load_state_dict(torch.load(args[f'model{protocol}_path']))
+            model = model.to(device)
             print(f"Evaluating protocol {protocol}...")
             model.eval()
             dataset = CasiaSurfDataset(protocol, train=False)
-            dataloader = data.DataLoader(
-                dataset, sampler=torch.utils.data.SubsetRandomSampler(range(0, 100)))
+            dataloader = data.DataLoader(dataset)
             result = {}
             with torch.no_grad():
                 for i, batch in enumerate(tqdm(dataloader)):
@@ -58,6 +58,4 @@ The final merged file (for submission) contains a total of 600 lines. Each line 
                         result[video_id] = []
                     result[video_id].append(liveness_prob)
             for video_id, frame_probs in result.items():
-                print(video_id, np.mean(frame_probs))
                 submission.write(f'{video_id} {np.mean(frame_probs):.5f}\n')
-        submission.close()

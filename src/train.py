@@ -14,8 +14,8 @@ def get_loader(dataset, batch_size=8, split=(4, 1)):
     train_indices = list(set(range(len(dataset))).difference(val_indices))
     train_sampler = SubsetRandomSampler(train_indices)
     vaild_sampler = SubsetRandomSampler(val_indices)
-    return DataLoader(dataset, sampler=train_sampler, batch_size=batch_size),
-    DataLoader(dataset, sampler=vaild_sampler, batch_size=batch_size)
+    return DataLoader(dataset, sampler=train_sampler, batch_size=batch_size),\
+        DataLoader(dataset, sampler=vaild_sampler, batch_size=batch_size)
 
 
 if __name__ == '__main__':
@@ -30,7 +30,7 @@ if __name__ == '__main__':
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
     train_loader, val_loader = get_loader(dataset)
     model = models.mobilenet_v2(
-        num_classes=2) if not checkpoint else torch.load(args.checkpoint)
+        num_classes=2) if not args.checkpoint else torch.load(args.checkpoint)
     model = model.to(device)
     optimizer = optim.Adam(model.parameters())
     loss_fn = nn.CrossEntropyLoss()

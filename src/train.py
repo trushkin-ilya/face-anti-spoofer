@@ -55,6 +55,7 @@ if __name__ == '__main__':
             model.eval()
             print("Evaluating...")
             val_loss = []
+            val_acc = []
             with torch.no_grad():
                 for i, batch in enumerate(val_loader):
                     images, labels = batch
@@ -62,5 +63,8 @@ if __name__ == '__main__':
                     images, labels = images.to(device), labels.to(device)
                     outputs = model(images)
                     loss = loss_fn(outputs, labels)
+                    acc = (torch.max(outputs.data, 1) == labels).sum().item()
+                    val_acc.append(acc.item())
                     val_loss.append(loss.item())
-                print(f"\t\t\tValidation loss: {np.mean(val_loss)}")
+                print(
+                    f"\t\t\tValidation loss: {np.mean(val_loss)}\t accuracy: {np.mean(val_acc)}")

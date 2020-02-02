@@ -20,9 +20,9 @@ class MfsdDataset(Dataset):
         self.real_dir = real_dir
         self.images = [{'image': os.path.join(attack_dir, img),
                         'label': 'spoof'} for img in os.listdir(attack_dir)]
-        self.images = self.images + [{'image': os.path.join(real_dir, img),
-                                      'label': 'live'}
-                                     for img in os.listdir(real_dir)]
+        self.images += [{'image': os.path.join(real_dir, img),
+                         'label': 'live'}
+                        for img in os.listdir(real_dir)]
         self.transform = Compose([Resize((320, 240)), ToTensor()])
 
     def __len__(self):

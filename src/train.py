@@ -5,6 +5,7 @@ import torch
 from torch import optim, nn
 from torchvision import models
 import argparse
+from tensorboardX import SummaryWriter
 
 
 def get_loader(dataset, batch_size=8, split=(4, 1)):
@@ -34,6 +35,7 @@ if __name__ == '__main__':
     model = model.to(device)
     optimizer = optim.Adam(model.parameters())
     loss_fn = nn.CrossEntropyLoss()
+    writer = SummaryWriter()
     print(model)
     for epoch in range(args.epochs):
         model.train()
@@ -66,5 +68,9 @@ if __name__ == '__main__':
                     acc = (torch.max(outputs.data, 1) == labels).sum().item()
                     val_acc.append(acc.item())
                     val_loss.append(loss.item())
-                print(
-                    f"\t\t\tValidation loss: {np.mean(val_loss)}\t accuracy: {np.mean(val_acc)}")
+            avg_loss = np.mean(val_loss)
+            avg_acc = np.mean(val_acc)
+            print(
+                f"\t\t\tValidation loss: {avg_loss}\t accuracy: {avg_acc}")
+            writer.add_scalar('Validation loss', avg_loss, epoch)
+            writer.add_scalar('Validation accuracy', avg_acc, epoch)

@@ -45,3 +45,5 @@ pydevd*.log
 nodeLanguageServer/**
 .vscode
 /data/CASIA_SURF/
+.ipynb_checkpoints
+*/.ipynb_checkpoints/*

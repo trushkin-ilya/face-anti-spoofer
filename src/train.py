@@ -3,7 +3,7 @@ from torch.utils.data import DataLoader, SubsetRandomSampler
 import numpy as np
 import torch
 from torch import optim, nn
-from torchvision import models
+from torchvision import models, transforms
 import argparse
 from tensorboardX import SummaryWriter
 import os
@@ -29,7 +29,7 @@ if __name__ == '__main__':
     argparser.add_argument('--eval_every', type=int, default=1)
     argparser.add_argument('--save_path', type=str, required=True)
     args = argparser.parse_args()
-    dataset = CasiaSurfDataset(args.protocol)
+    dataset = CasiaSurfDataset(args.protocol, transform=transforms.Resize((320,240)))
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
     train_loader, val_loader = get_loader(dataset)
     model = models.mobilenet_v2(

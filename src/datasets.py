@@ -1,6 +1,6 @@
 import os
 from torch.utils.data import Dataset
-from torchvision.transforms import Resize, ToTensor, Compose
+from torchvision import transforms
 import torch
 from PIL import Image
 import re
@@ -9,7 +9,7 @@ import re
 class MfsdDataset(Dataset):
     """Mfsd dataset."""
 
-    def __init__(self, attack_dir, real_dir):
+    def __init__(self, attack_dir, real_dir, transform=None):
         """
         Args:
             dir (string): Directory with all the images.
@@ -23,7 +23,7 @@ class MfsdDataset(Dataset):
         self.images += [{'image': os.path.join(real_dir, img),
                          'label': 'live'}
                         for img in os.listdir(real_dir)]
-        self.transform = Compose([Resize((320, 240)), ToTensor()])
+        self.transform = transforms.Compose([transform, transforms.ToTensor()])
 
     def __len__(self):
         return len(self.items)
@@ -40,7 +40,7 @@ class MfsdDataset(Dataset):
 
 
 class CasiaSurfDataset(Dataset):
-    def __init__(self, protocol: int, dir: str = '../data/CASIA_SURF', train: bool = True, ):
+    def __init__(self, protocol: int, dir: str = '../data/CASIA_SURF', train: bool = True, transform = None):
         txt_metadata = 'train' if train else 'dev_res'
         self.dir = dir
         file_name = f'4@{protocol}_{txt_metadata}.txt'
@@ -56,7 +56,7 @@ class CasiaSurfDataset(Dataset):
                         item = os.path.join(dir_name, file_name)
                         self.items.append((item, -1))
 
-        self.transform = Compose([Resize((320, 240)), ToTensor()])
+        self.transform = transforms.Compose([transform, transforms.ToTensor()])
 
     def __len__(self):
         return len(self.items)

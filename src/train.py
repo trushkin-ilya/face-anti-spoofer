@@ -5,7 +5,7 @@ import torch
 from torch import optim, nn
 from torchvision import models, transforms
 import argparse
-from tensorboardX import SummaryWriter
+from torch.utils.tensorboard import SummaryWriter
 import os
 
 

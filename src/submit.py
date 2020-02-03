@@ -34,9 +34,10 @@ The final merged file (for submission) contains a total of 600 lines. Each line 
     argparser.add_argument('--model1_path', type=str, required=True)
     argparser.add_argument('--model2_path', type=str, required=True)
     argparser.add_argument('--model3_path', type=str, required=True)
+    argparser.add_argument('--num_classes', type=int, default=2)
     args = argparser.parse_args()
 
-    model = models.mobilenet_v2(num_classes=2)
+    model = models.mobilenet_v2(num_classes=args.num_classes)
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
     with open('submission.txt', 'w+') as submission:
         for protocol in [1, 2, 3]:

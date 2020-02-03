@@ -6,6 +6,7 @@ from torch import optim, nn
 from torchvision import models
 import argparse
 from tensorboardX import SummaryWriter
+import os
 
 
 def get_loader(dataset, batch_size=8, split=(4, 1)):
@@ -26,6 +27,7 @@ if __name__ == '__main__':
     argparser.add_argument('--checkpoint', type=str)
     argparser.add_argument('--batch_size', type=int, required=True)
     argparser.add_argument('--eval_every', type=int, default=1)
+    argparser.add_argument('--save_path', type=str, required=True)
     args = argparser.parse_args()
     dataset = CasiaSurfDataset(args.protocol)
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
@@ -50,8 +52,9 @@ if __name__ == '__main__':
                 f'Epoch: {epoch + 1}/{args.epochs}\tBatch: {i + 1}/{len(train_loader)}\tLoss: {loss.item()}')
             loss.backward()
             optimizer.step()
-        torch.save(model.state_dict,
-                   f'checkpoints/mobilenet_v2_protocol{args.protocol}({epoch}).pt')
+        file_name = f'mobilenet_v2_protocol{args.protocol}({epoch}).pt'
+        os.makedirs(args.save_path, exist_ok=True)
+        torch.save(model.state_dict, os.path.join(args.save_path, file_name))
 
         if epoch % args.eval_every == 1:
             model.eval()

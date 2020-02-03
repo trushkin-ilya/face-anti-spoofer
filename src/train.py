@@ -74,3 +74,4 @@ if __name__ == '__main__':
                 f"\t\t\tValidation loss: {avg_loss}\t accuracy: {avg_acc}")
             writer.add_scalar('Validation loss', avg_loss, epoch)
             writer.add_scalar('Validation accuracy', avg_acc, epoch)
+    writer.close()

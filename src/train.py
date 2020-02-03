@@ -12,6 +12,7 @@ import os
 def get_loader(dataset, batch_size=8, split=(4, 1)):
     val_q = len(dataset) // sum(split) * split[1]
 
+    np.random.seed(2020)
     val_indices = np.random.choice(list(range(len(dataset))), val_q)
     train_indices = list(set(range(len(dataset))).difference(val_indices))
     train_sampler = SubsetRandomSampler(train_indices)

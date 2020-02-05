@@ -1,19 +1,15 @@
 # Deep Learning based Face Anti-Spoofing
 Implementation of face anti-spoofing task solution.
 
+## Requirements
+* Python 3.7.6
+* PyTorch 1.4.0
+
 ## Setup
 1. Get CASIA-SURF dataset.
-2. Move dataset folder to `data/CASIA_SURF`. Make sure the structure looks like:
+2. Move dataset folder to `data/CASIA_SURF`:
 ```
-src/
-  ...
-data/
-  CASIA_SURF/
-    dev/
-      ...
-    train/
-      ...
-    ...
+ln -s <your_path_to_CASIA> data/CASIA_SURF
 ```
 3. Install requirements:
 `pip install -r requirements.txt`
@@ -24,7 +20,7 @@ data/
 
 2. Run training process:
 ```
-python train.py --protocol <protocol> --batch_size <batch_size> --save_path <save_path>
+python src/train.py --protocol <protocol> --batch_size <batch_size> --save_path <save_path>
 ```
 
 Protocol should be either 1, 2 or 3. It determines CASIA-SURF benchmark protocol.

@@ -40,7 +40,7 @@ class MfsdDataset(Dataset):
 
 
 class CasiaSurfDataset(Dataset):
-    def __init__(self, protocol: int, dir: str = '../data/CASIA_SURF', train: bool = True, transform = None):
+    def __init__(self, protocol: int, dir: str = 'data/CASIA_SURF', train: bool = True, transform = None):
         txt_metadata = 'train' if train else 'dev_res'
         self.dir = dir
         file_name = f'4@{protocol}_{txt_metadata}.txt'

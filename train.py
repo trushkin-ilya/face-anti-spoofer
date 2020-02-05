@@ -60,5 +60,5 @@ if __name__ == '__main__':
             torch.save(model.state_dict, os.path.join(
                 args.save_path, file_name))
 
-        if epoch % args.eval_every == 1:
+        if epoch % args.eval_every == 0 and epoch > 0:
             evaluate(dataloader.val, model, loss_fn)

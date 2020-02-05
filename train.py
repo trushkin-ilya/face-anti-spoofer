@@ -56,7 +56,7 @@ if __name__ == '__main__':
         if epoch % args.save_every == 0 and epoch > 0:
             file_name = f'mobilenet_v2_protocol{args.protocol}({epoch}).pt'
             os.makedirs(args.save_path, exist_ok=True)
-            torch.save(model.state_dict, os.path.join(
+            torch.save(model.state_dict(), os.path.join(
                 args.save_path, file_name))
 
         if epoch % args.eval_every == 1:

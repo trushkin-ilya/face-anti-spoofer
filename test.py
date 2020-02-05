@@ -35,7 +35,7 @@ def evaluate(dataloader: data.DataLoader, model: nn.Module, loss_fn: nn.Module):
 if __name__ == '__main__':
     argparser = ArgumentParser()
     argparser.add_argument('--protocol', type=int, required=True)
-    argparser.add_argument('--data-dir', type=str, default="./CASIA-SURF")
+    argparser.add_argument('--data-dir', type=str, default=os.path.combine('data', 'CASIA_SURF'))
     argparser.add_argument('--checkpoint', type=str, required=True)
     argparser.add_argument('--num_classes', type=int, default=2)
     argparser.add_argument('--batch_size', type=int, default=1)
@@ -44,6 +44,7 @@ if __name__ == '__main__':
                                train=False, transform=transforms.Resize((320, 240)))
     dataloader = data.DataLoader(dataset, batch_size=args.batch_size)
     model = models.mobilenet_v2(num_classes=args.num_classes)
-    model.load_state_dict(torch.load(args.checkpoint))
+    device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+    model.load_state_dict(torch.load(args.checkpoint, map_location=device))
     loss_fn = nn.CrossEntropyLoss()
     evaluate(dataloader, model, loss_fn)

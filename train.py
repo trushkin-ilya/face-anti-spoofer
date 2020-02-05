@@ -43,7 +43,9 @@ if __name__ == '__main__':
     dataloader = utils.SplittedDataLoader(
         dataset, args.train_batch_size, args.val_batch_size)
     model = models.mobilenet_v2(
-        num_classes=args.num_classes) if not args.checkpoint else torch.load(args.checkpoint)
+        num_classes=args.num_classes)
+    if args.checkpoint:
+        model.load_state_dict(torch.load(args.checkpoint, map_location=device))
     model = model.to(device)
     print(model)
 

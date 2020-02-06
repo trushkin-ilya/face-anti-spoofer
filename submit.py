@@ -41,7 +41,7 @@ The final merged file (for submission) contains a total of 600 lines. Each line 
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
     with open('submission.txt', 'w+') as submission:
         for protocol in [1, 2, 3]:
-            model.load_state_dict(torch.load(args[f'model{protocol}_path'], map_location=device))
+            model.load_state_dict(torch.load(getattr(args, f'model{protocol}_path'), map_location=device))
             model = model.to(device)
             print(f"Evaluating protocol {protocol}...")
             model.eval()

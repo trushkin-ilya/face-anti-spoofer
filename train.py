@@ -35,15 +35,14 @@ if __name__ == '__main__':
     argparser.add_argument('--lr', type=float, default=3e-3)
     argparser.add_argument('--num_classes', type=int, default=2)
     argparser.add_argument('--save_every', type=int, default=1)
+    argparser.add_argument('--num_workers', type=int, default=0)
     args = argparser.parse_args()
 
     dataset = CasiaSurfDataset(
         args.protocol, transform=transforms.Resize((320, 240)))
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
-    dataloader = utils.SplittedDataLoader(
-        dataset, args.train_batch_size, args.val_batch_size)
-    model = models.mobilenet_v2(
-        num_classes=args.num_classes)
+    dataloader = utils.SplittedDataLoader(dataset, args.train_batch_size, args.val_batch_size, args.num_workers)
+    model = models.mobilenet_v2(num_classes=args.num_classes)
     if args.checkpoint:
         model.load_state_dict(torch.load(args.checkpoint, map_location=device))
     model = model.to(device)
@@ -55,11 +54,11 @@ if __name__ == '__main__':
               loss_fn=nn.CrossEntropyLoss(),
               optimizer=optim.Adam(model.parameters(), lr=args.lr))
 
-        if epoch % args.save_every == 0 and epoch > 0:
+        if epoch % args.save_every == 0:
             file_name = f'mobilenet_v2_protocol{args.protocol}({epoch}).pt'
             os.makedirs(args.save_path, exist_ok=True)
             torch.save(model.state_dict, os.path.join(
                 args.save_path, file_name))
 
-        if epoch % args.eval_every == 1:
+        if epoch % args.eval_every == 0 and epoch > 0:
             evaluate(dataloader.val, model, loss_fn)

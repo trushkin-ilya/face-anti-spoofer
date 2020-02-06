@@ -1,32 +1,34 @@
 from torch.utils import data
 from torch import nn
 import torch
-import numpy as np
 from argparse import ArgumentParser
 from datasets import CasiaSurfDataset
 from torchvision import models, transforms
 import os
+from sklearn import metrics
 
 
-def evaluate(dataloader: data.DataLoader, model: nn.Module, loss_fn: nn.Module):
+def evaluate(dataloader: data.DataLoader, model: nn.Module):
     model.eval()
     print("Evaluating...")
-    val_loss = []
-    val_acc = []
+    tp, tn, fp, fn = 0, 0, 0, 0
     with torch.no_grad():
         for i, batch in enumerate(dataloader):
             images, labels = batch
             labels = torch.LongTensor(labels)
             images, labels = images.to(device), labels.to(device)
             outputs = model(images)
-            loss = loss_fn(outputs, labels)
-            acc = (torch.max(outputs.data, 1)[1] == labels).sum().item()
-            val_acc.append(acc.item())
-            val_loss.append(loss.item())
-    avg_loss = np.mean(val_loss)
-    avg_acc = np.mean(val_acc)
+            tn_batch, fp_batch, fn_batch, tp_batch = metrics.confusion_matrix(labels,
+                                                                              torch.max(outputs.data, 1)[1]).ravel()
+            tp += tp_batch
+            tn += tn_batch
+            fp += fp_batch
+            fn += fn_batch
+    apcer = fp / (tn + fp)
+    bpcer = fn / (fn + tp)
+    acer = (apcer + bpcer) / 2
 
-    return avg_loss, avg_acc
+    return apcer, bpcer, acer
 
 
 if __name__ == '__main__':
@@ -43,6 +45,5 @@ if __name__ == '__main__':
     model = models.mobilenet_v2(num_classes=args.num_classes)
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
     model.load_state_dict(torch.load(args.checkpoint, map_location=device))
-    loss_fn = nn.CrossEntropyLoss()
-    avg_loss, avg_acc = evaluate(dataloader, model, loss_fn)
-    print(f'Average loss: {avg_loss}, Average Accuracy: {avg_acc}')
+    apcer, bpcer, acer = evaluate(dataloader, model)
+    print(f'APCER: {apcer}, BPCER: {bpcer}, ACER: {acer}')

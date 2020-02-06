@@ -41,7 +41,8 @@ if __name__ == '__main__':
     dataset = CasiaSurfDataset(
         args.protocol, transform=transforms.Resize((320, 240)))
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
-    dataloader = utils.SplittedDataLoader(dataset, train_batch_size=args.train_batch_size, val_batch_size=args.val_batch_size, num_workers=args.num_workers)
+    dataloader = utils.SplittedDataLoader(dataset, train_batch_size=args.train_batch_size,
+                                          val_batch_size=args.val_batch_size, num_workers=args.num_workers)
     model = models.mobilenet_v2(num_classes=args.num_classes)
     if args.checkpoint:
         model.load_state_dict(torch.load(args.checkpoint, map_location=device))
@@ -61,10 +62,11 @@ if __name__ == '__main__':
             torch.save(model.state_dict(), os.path.join(
                 args.save_path, file_name))
 
-        if epoch % args.eval_every == 0 and epoch > 0:
-            avg_loss, avg_acc = evaluate(dataloader.val, model)
+        if epoch % args.eval_every == 0:
+            apcer, bpcer, acer = evaluate(dataloader.val, model)
             print(
-                f"\t\t\tValidation loss: {avg_loss}\t accuracy: {avg_acc}")
-            writer.add_scalar('Validation loss', avg_loss, epoch)
-            writer.add_scalar('Validation accuracy', avg_acc, epoch)
-            writer.close()
+                f"\t\t\tAPCER: {apcer}\t BPCER: {bpcer}\t ACER: {acer}")
+            writer.add_scalar('APCER', apcer, epoch)
+            writer.add_scalar('BPCER', bpcer, epoch)
+            writer.add_scalar('ACER', acer, epoch)
+    writer.close()

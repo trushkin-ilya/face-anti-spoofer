@@ -1,9 +1,10 @@
 import numpy as np
 from torch.utils import data
 
+
 class SplittedDataLoader:
-    def __init__(self, dataset: data.Dataset, batch_size:int, split=(4, 1)):
-        dataset= dataset
+    def __init__(self, dataset: data.Dataset, train_batch_size: int, val_batch_size: int, split=(4, 1)):
+        dataset = dataset
         val_q = len(dataset) // sum(split) * split[1]
 
         np.random.seed(2020)
@@ -12,5 +13,7 @@ class SplittedDataLoader:
         train_sampler = data.SubsetRandomSampler(train_indices)
         vaild_sampler = data.SubsetRandomSampler(val_indices)
 
-        self.train = data.DataLoader(dataset, sampler=train_sampler, batch_size=batch_size)
-        self.val = data.DataLoader(dataset, sampler=vaild_sampler, batch_size=batch_size)
+        self.train = data.DataLoader(
+            dataset, sampler=train_sampler, batch_size=train_batch_size)
+        self.val = data.DataLoader(
+            dataset, sampler=vaild_sampler, batch_size=val_batch_size)

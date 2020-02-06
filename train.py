@@ -35,15 +35,16 @@ if __name__ == '__main__':
     argparser.add_argument('--lr', type=float, default=3e-3)
     argparser.add_argument('--num_classes', type=int, default=2)
     argparser.add_argument('--save_every', type=int, default=1)
+    argparser.add_argument('--num_workers', type=int, default=0)
     args = argparser.parse_args()
 
     dataset = CasiaSurfDataset(
         args.protocol, transform=transforms.Resize((320, 240)))
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
-    dataloader = utils.SplittedDataLoader(
-        dataset, args.train_batch_size, args.val_batch_size)
-    model = models.mobilenet_v2(
-        num_classes=args.num_classes) if not args.checkpoint else torch.load(args.checkpoint)
+    dataloader = utils.SplittedDataLoader(dataset, args.batch_size, args.num_workers)
+    model = models.mobilenet_v2(num_classes=args.num_classes)
+    if args.checkpoint:
+        model.load_state_dict(torch.load(args.checkpoint, map_location=device))
     model = model.to(device)
     print(model)
 

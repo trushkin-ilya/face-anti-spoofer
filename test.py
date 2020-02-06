@@ -5,9 +5,9 @@ import numpy as np
 from argparse import ArgumentParser
 from datasets import CasiaSurfDataset
 from torchvision import models
- 
- 
-def evaluate(dataloader:data.DataLoader, model: nn.Module, loss_fn:nn.Module):
+
+
+def evaluate(dataloader: data.DataLoader, model: nn.Module, loss_fn: nn.Module):
     model.eval()
     writer = tensorboard.SummaryWriter()
     print("Evaluating...")
@@ -31,19 +31,19 @@ def evaluate(dataloader:data.DataLoader, model: nn.Module, loss_fn:nn.Module):
     writer.add_scalar('Validation accuracy', avg_acc, epoch)
     writer.close()
 
+
 if __name__ == '__main__':
     argparser = ArgumentParser()
     argparser.add_argument('--protocol', type=int, required=True)
     argparser.add_argument('--data-dir', type=str, default="./CASIA-SURF")
     argparser.add_argument('--checkpoint', type=str, required=True)
     argparser.add_argument('--num_classes', type=int, default=2)
+    argparser.add_argument('--batch_size', type=int, default=1)
     args = argparser.parse_args()
-    dataset = CasiaSurfDataset(args.protocol, dir=args.data_dir, train=False, transform=transforms.Resize((320, 240)))
-    dataloader = data.DataLoader(dataset)
+    dataset = CasiaSurfDataset(args.protocol, dir=args.data_dir,
+                               train=False, transform=transforms.Resize((320, 240)))
+    dataloader = data.DataLoader(dataset, batch_size=args.batch_size)
     model = models.mobilenet_v2(num_classes=args.num_classes)
     model.load_state_dict(torch.load(args.checkpoint))
     loss_fn = nn.CrossEntropyLoss()
     evaluate(dataloader, model, loss_fn)
-    
-
-    

@@ -54,7 +54,7 @@ if __name__ == '__main__':
               loss_fn=nn.CrossEntropyLoss(),
               optimizer=optim.Adam(model.parameters(), lr=args.lr))
 
-        if epoch % args.save_every == 0 and epoch > 0:
+        if epoch % args.save_every == 0:
             file_name = f'mobilenet_v2_protocol{args.protocol}({epoch}).pt'
             os.makedirs(args.save_path, exist_ok=True)
             torch.save(model.state_dict, os.path.join(

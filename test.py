@@ -1,15 +1,15 @@
-from torch.utils import data, tensorboard
+from torch.utils import data
 from torch import nn
 import torch
 import numpy as np
 from argparse import ArgumentParser
 from datasets import CasiaSurfDataset
-from torchvision import models
+from torchvision import models, transforms
+import os
 
 
 def evaluate(dataloader: data.DataLoader, model: nn.Module, loss_fn: nn.Module):
     model.eval()
-    writer = tensorboard.SummaryWriter()
     print("Evaluating...")
     val_loss = []
     val_acc = []
@@ -25,11 +25,8 @@ def evaluate(dataloader: data.DataLoader, model: nn.Module, loss_fn: nn.Module):
             val_loss.append(loss.item())
     avg_loss = np.mean(val_loss)
     avg_acc = np.mean(val_acc)
-    print(
-        f"\t\t\tValidation loss: {avg_loss}\t accuracy: {avg_acc}")
-    writer.add_scalar('Validation loss', avg_loss, epoch)
-    writer.add_scalar('Validation accuracy', avg_acc, epoch)
-    writer.close()
+
+    return avg_loss, avg_acc
 
 
 if __name__ == '__main__':
@@ -47,4 +44,5 @@ if __name__ == '__main__':
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
     model.load_state_dict(torch.load(args.checkpoint, map_location=device))
     loss_fn = nn.CrossEntropyLoss()
-    evaluate(dataloader, model, loss_fn)
+    avg_loss, avg_acc = evaluate(dataloader, model, loss_fn)
+    print(f'Average loss: {avg_loss}, Average Accuracy: {avg_acc}')

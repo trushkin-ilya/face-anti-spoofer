@@ -48,3 +48,5 @@ nodeLanguageServer/**
 .ipynb_checkpoints
 */.ipynb_checkpoints/*
 runs/
+.idea/
+venv

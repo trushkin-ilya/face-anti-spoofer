@@ -1,8 +1,8 @@
 from datasets import CasiaSurfDataset
-import numpy as np
 import torch
 from torch import optim, nn
 from torchvision import models, transforms
+from torch.utils import tensorboard
 import argparse
 from test import evaluate
 import os
@@ -18,7 +18,7 @@ def train(model, dataloader, loss_fn, optimizer):
         outputs = model(images)
         loss = loss_fn(outputs, labels)
         print(
-            f'Epoch: {epoch + 1}/{args.epochs}\tBatch: {i + 1}/{len(train_loader)}\tLoss: {loss.item()}')
+            f'Epoch: {epoch + 1}/{args.epochs}\tBatch: {i + 1}/{len(dataloader)}\tLoss: {loss.item()}')
         loss.backward()
         optimizer.step()
 
@@ -41,12 +41,13 @@ if __name__ == '__main__':
     dataset = CasiaSurfDataset(
         args.protocol, transform=transforms.Resize((320, 240)))
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
-    dataloader = utils.SplittedDataLoader(dataset, args.train_batch_size, args.val_batch_size, args.num_workers)
+    dataloader = utils.SplittedDataLoader(dataset, train_batch_size=args.train_batch_size, val_batch_size=args.val_batch_size, num_workers=args.num_workers)
     model = models.mobilenet_v2(num_classes=args.num_classes)
     if args.checkpoint:
         model.load_state_dict(torch.load(args.checkpoint, map_location=device))
     model = model.to(device)
     print(model)
+    writer = tensorboard.SummaryWriter()
 
     for epoch in range(args.epochs):
         train(model,
@@ -61,4 +62,9 @@ if __name__ == '__main__':
                 args.save_path, file_name))
 
         if epoch % args.eval_every == 0 and epoch > 0:
-            evaluate(dataloader.val, model, loss_fn)
+            avg_loss, avg_acc = evaluate(dataloader.val, model)
+            print(
+                f"\t\t\tValidation loss: {avg_loss}\t accuracy: {avg_acc}")
+            writer.add_scalar('Validation loss', avg_loss, epoch)
+            writer.add_scalar('Validation accuracy', avg_acc, epoch)
+            writer.close()

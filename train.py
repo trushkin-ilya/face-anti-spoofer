@@ -41,7 +41,7 @@ if __name__ == '__main__':
     dataset = CasiaSurfDataset(
         args.protocol, transform=transforms.Resize((320, 240)))
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
-    dataloader = utils.SplittedDataLoader(dataset, args.train_batch_size, args.val_batch_size, args.num_workers)
+    dataloader = utils.SplittedDataLoader(dataset, train_batch_size=args.train_batch_size, val_batch_size=args.val_batch_size, num_workers=args.num_workers)
     model = models.mobilenet_v2(num_classes=args.num_classes)
     if args.checkpoint:
         model.load_state_dict(torch.load(args.checkpoint, map_location=device))

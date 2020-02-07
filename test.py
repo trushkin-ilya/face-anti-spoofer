@@ -11,14 +11,14 @@ from tqdm import tqdm
 
 
 def evaluate(dataloader: data.DataLoader, model: nn.Module):
+    device = next(model.parameters()).device
     model.eval()
     print("Evaluating...")
     tp, tn, fp, fn = 0, 0, 0, 0
     with torch.no_grad():
         for i, batch in enumerate(tqdm(dataloader)):
             images, labels = batch
-            labels = torch.LongTensor(labels)
-            outputs = model(images)
+            outputs = model(images.to(device))
             outputs = outputs.cpu()
             tn_batch, fp_batch, fn_batch, tp_batch = metrics.confusion_matrix(y_true=labels,
                                                                               y_pred=torch.max(outputs.data, 1)[1],

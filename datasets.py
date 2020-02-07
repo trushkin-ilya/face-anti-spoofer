@@ -56,7 +56,7 @@ class CasiaSurfDataset(Dataset):
                         item = os.path.join(dir_name, file_name)
                         self.items.append((item, -1))
 
-        self.transform = transforms.Compose([transform, transforms.ToTensor()])
+        self.transform = transforms.Compose([transform, transforms.ToTensor()]) if transform else transforms.ToTensor()
 
     def __len__(self):
         return len(self.items)

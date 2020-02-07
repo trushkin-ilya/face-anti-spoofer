@@ -11,7 +11,6 @@ from tqdm import tqdm
 
 
 def evaluate(dataloader: data.DataLoader, model: nn.Module):
-    device = next(model.parameters()).device
     model.eval()
     print("Evaluating...")
     tp, tn, fp, fn = 0, 0, 0, 0
@@ -19,8 +18,8 @@ def evaluate(dataloader: data.DataLoader, model: nn.Module):
         for i, batch in enumerate(tqdm(dataloader)):
             images, labels = batch
             labels = torch.LongTensor(labels)
-            images, labels = images.to(device), labels.to(device)
             outputs = model(images)
+            outputs = outputs.cpu()
             tn_batch, fp_batch, fn_batch, tp_batch = metrics.confusion_matrix(y_true=labels,
                                                                               y_pred=torch.max(outputs.data, 1)[1],
                                                                               labels=[0, 1]).ravel()
@@ -46,7 +45,6 @@ if __name__ == '__main__':
     dataset = CasiaSurfDataset(args.protocol, dir=args.data_dir)
     dataloader = SplittedDataLoader(dataset, train_batch_size=1, val_batch_size=args.batch_size)
     model = models.mobilenet_v2(num_classes=args.num_classes)
-    device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
-    model.load_state_dict(torch.load(args.checkpoint, map_location=device))
+    model.load_state_dict(torch.load(args.checkpoint, map_location='cpu'))
     apcer, bpcer, acer = evaluate(dataloader.val, model)
     print(f'APCER: {apcer}, BPCER: {bpcer}, ACER: {acer}')

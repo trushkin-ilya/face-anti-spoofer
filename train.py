@@ -72,4 +72,5 @@ if __name__ == '__main__':
             writer.add_scalar('APCER', apcer, epoch)
             writer.add_scalar('BPCER', bpcer, epoch)
             writer.add_scalar('ACER', acer, epoch)
+            writer.add_scalar('Learning rate', optimizer.param_groups[0]['lr'])
     writer.close()

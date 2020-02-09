@@ -49,12 +49,14 @@ if __name__ == '__main__':
     model = model.to(device)
     print(model)
     writer = tensorboard.SummaryWriter()
+    optimizer = optim.Adam(model.parameters(), lr=args.lr)
+    scheduler = optim.lr_scheduler.ReduceLROnPlateau(optimizer)
 
     for epoch in range(args.epochs):
         train(model,
               dataloader=dataloader.train,
               loss_fn=nn.CrossEntropyLoss(),
-              optimizer=optim.Adam(model.parameters(), lr=args.lr))
+              optimizer=optimizer)
 
         if epoch % args.save_every == 0:
             file_name = f'mobilenet_v2_protocol{args.protocol}({epoch}).pt'
@@ -64,6 +66,7 @@ if __name__ == '__main__':
 
         if epoch % args.eval_every == 0:
             apcer, bpcer, acer = evaluate(dataloader.val, model)
+            scheduler.step(acer)
             print(
                 f"\t\t\tAPCER: {apcer}\t BPCER: {bpcer}\t ACER: {acer}")
             writer.add_scalar('APCER', apcer, epoch)

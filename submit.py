@@ -1,5 +1,5 @@
 import argparse
-from torchvision import models
+from torchvision import models, transforms
 from datasets import CasiaSurfDataset
 from torch.utils import data
 import torch
@@ -45,18 +45,20 @@ The final merged file (for submission) contains a total of 600 lines. Each line 
             model = model.to(device)
             print(f"Evaluating protocol {protocol}...")
             model.eval()
-            dataset = CasiaSurfDataset(protocol, train=False)
+            dataset = CasiaSurfDataset(protocol, train=False, transform=transforms.Resize((320, 240)))
             dataloader = data.DataLoader(dataset)
-            result = {}
+
+            video_id = None
+            probs = []
             with torch.no_grad():
-                for i, batch in enumerate(tqdm(dataloader)):
-                    inputs, labels = batch
+                for i, (inputs, labels) in enumerate(tqdm(dataloader)):
                     inputs = inputs.to(device)
                     outputs = model(inputs)
-                    liveness_prob = F.softmax(outputs, dim=1)[0][1]
-                    video_id = dataset.get_video_id(i)
-                    if video_id not in result:
-                        result[video_id] = []
-                    result[video_id].append(liveness_prob)
-            for video_id, frame_probs in result.items():
-                submission.write(f'{video_id} {np.mean(frame_probs):.5f}\n')
+                    liveness_prob = F.softmax(outputs, dim=1)[0][1].item()
+                    next_video_id = dataset.get_video_id(i)
+                    if video_id and next_video_id != video_id:
+                        submission.write(f'{video_id} {np.mean(probs):.5f}\n')
+                        probs = [liveness_prob]
+                    else:
+                        probs.append(liveness_prob)
+                    video_id = next_video_id

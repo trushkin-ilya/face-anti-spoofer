@@ -4,7 +4,7 @@ from torch import nn
 import torch
 from argparse import ArgumentParser
 from datasets import CasiaSurfDataset
-from torchvision import models
+from torchvision import models, transforms
 import os
 from sklearn import metrics
 from tqdm import tqdm
@@ -42,7 +42,7 @@ if __name__ == '__main__':
     argparser.add_argument('--num_classes', type=int, default=2)
     argparser.add_argument('--batch_size', type=int, default=1)
     args = argparser.parse_args()
-    dataset = CasiaSurfDataset(args.protocol, dir=args.data_dir)
+    dataset = CasiaSurfDataset(args.protocol, dir=args.data_dir, transform=transforms.Resize((320, 240)))
     dataloader = SplittedDataLoader(dataset, train_batch_size=1, val_batch_size=args.batch_size)
     model = models.mobilenet_v2(num_classes=args.num_classes)
     model.load_state_dict(torch.load(args.checkpoint, map_location='cpu'))

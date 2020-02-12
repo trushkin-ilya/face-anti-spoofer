@@ -7,7 +7,7 @@ from datasets import CasiaSurfDataset
 from torch import optim, nn
 from torchvision import models, transforms
 from torch.utils import tensorboard
-from test import evaluate
+from .test import evaluate
 
 
 def train(model, dataloader, loss_fn, optimizer):

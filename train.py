@@ -4,10 +4,11 @@ import utils
 import torch
 
 from datasets import CasiaSurfDataset
+from models.feathernets import MobileLiteNet54_se
 from torch import optim, nn
 from torchvision import models, transforms
 from torch.utils import tensorboard
-from .test import evaluate
+from test import evaluate
 
 
 def train(model, dataloader, loss_fn, optimizer):
@@ -46,7 +47,7 @@ if __name__ == '__main__':
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
     dataloader = utils.SplittedDataLoader(dataset, train_batch_size=args.train_batch_size,
                                           val_batch_size=args.val_batch_size, num_workers=args.num_workers)
-    model = models.mobilenet_v2(num_classes=args.num_classes)
+    model = MobileLiteNet54_se(num_classes = args.num_classes)
     if args.checkpoint:
         model.load_state_dict(torch.load(args.checkpoint, map_location=device))
     model = model.to(device)

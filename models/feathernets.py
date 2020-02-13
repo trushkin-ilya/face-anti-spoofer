@@ -19,6 +19,46 @@ class SELayer(nn.Module):
         y = self.fc(y).view(b, c, 1, 1)
         return x * y
 
+# reference from https://github.com/tonylins/pytorch-mobilenet-v2/blob/master/MobileNetV2.py
+class InvertedResidual(nn.Module):
+    expansion = 1
+
+    def __init__(self, inplanes, planes, stride=1, downsample=None):
+        super(InvertedResidual, self).__init__()
+        self.expansion = 6
+        self.conv1 = nn.Conv2d(inplanes, inplanes * self.expansion, kernel_size=1, bias=False)
+        self.bn1 = nn.BatchNorm2d(inplanes * self.expansion)
+        self.conv2 = nn.Conv2d(inplanes * self.expansion, inplanes * self.expansion, kernel_size=3, stride=stride,
+                               padding=1, groups=inplanes, bias=False)
+        self.bn2 = nn.BatchNorm2d(inplanes * self.expansion)
+        self.conv3 = nn.Conv2d(inplanes * self.expansion, planes, kernel_size=1, bias=False)
+        self.bn3 = nn.BatchNorm2d(planes)
+        self.relu = nn.ReLU6(inplace=True)
+        self.downsample = downsample
+        self.stride = stride
+
+    def forward(self, x):
+        identity = x
+
+        out = self.conv1(x)
+        out = self.bn1(out)
+        out = self.relu(out)
+
+        out = self.conv2(out)
+        out = self.bn2(out)
+        out = self.relu(out)
+
+        out = self.conv3(out)
+        out = self.bn3(out)
+
+        if self.downsample is not None:
+            identity = self.downsample(x)
+
+        out += identity
+        out = out
+
+        return out
+
 class MobileLiteNet(nn.Module):
     def __init__(self, block, layers, num_classes, se=False):
 
@@ -108,3 +148,21 @@ class MobileLiteNet(nn.Module):
                 m.weight.data.normal_(0, 0.01)
                 m.bias.data.zero_()
 
+def MobileLiteNet54( **kwargs):
+    model = MobileLiteNet(InvertedResidual, [4, 4, 6, 3], num_classes=2,se = False, **kwargs)
+    return model
+def MobileLiteNet54_se( **kwargs):
+    model = MobileLiteNet(InvertedResidual, [4, 4, 6, 3], num_classes=2,se = True, **kwargs)
+    return model
+def MobileLiteNet102( **kwargs):
+    model = MobileLiteNet(InvertedResidual, [3, 4, 23, 3], num_classes=2,se = False, **kwargs)
+    return model
+def MobileLiteNet105_se( **kwargs):
+    model = MobileLiteNet(InvertedResidual, [4, 4, 23, 3], num_classes=2,se = True, **kwargs)
+    return model
+def MobileLiteNet153( **kwargs):
+    model = MobileLiteNet(InvertedResidual, [3, 8, 36, 3], num_classes=2,se = False, **kwargs)
+    return model
+def MobileLiteNet156_se( **kwargs):
+    model = MobileLiteNet(InvertedResidual, [4, 8, 36, 3], num_classes=2,se = True, **kwargs)
+    return model

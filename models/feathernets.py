@@ -149,20 +149,20 @@ class MobileLiteNet(nn.Module):
                 m.bias.data.zero_()
 
 def MobileLiteNet54( **kwargs):
-    model = MobileLiteNet(InvertedResidual, [4, 4, 6, 3], num_classes=2,se = False, **kwargs)
+    model = MobileLiteNet(InvertedResidual, [4, 4, 6, 3], se=False, **kwargs)
     return model
 def MobileLiteNet54_se( **kwargs):
-    model = MobileLiteNet(InvertedResidual, [4, 4, 6, 3], num_classes=2,se = True, **kwargs)
+    model = MobileLiteNet(InvertedResidual, [4, 4, 6, 3], se=True, **kwargs)
     return model
 def MobileLiteNet102( **kwargs):
-    model = MobileLiteNet(InvertedResidual, [3, 4, 23, 3], num_classes=2,se = False, **kwargs)
+    model = MobileLiteNet(InvertedResidual, [3, 4, 23, 3], se=False, **kwargs)
     return model
 def MobileLiteNet105_se( **kwargs):
-    model = MobileLiteNet(InvertedResidual, [4, 4, 23, 3], num_classes=2,se = True, **kwargs)
+    model = MobileLiteNet(InvertedResidual, [4, 4, 23, 3], se=True, **kwargs)
     return model
 def MobileLiteNet153( **kwargs):
-    model = MobileLiteNet(InvertedResidual, [3, 8, 36, 3], num_classes=2,se = False, **kwargs)
+    model = MobileLiteNet(InvertedResidual, [3, 8, 36, 3], se=False, **kwargs)
     return model
 def MobileLiteNet156_se( **kwargs):
-    model = MobileLiteNet(InvertedResidual, [4, 8, 36, 3], num_classes=2,se = True, **kwargs)
+    model = MobileLiteNet(InvertedResidual, [4, 8, 36, 3], se=True, **kwargs)
     return model

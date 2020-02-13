@@ -41,7 +41,7 @@ if __name__ == '__main__':
     args = argparser.parse_args()
 
     dataset = CasiaSurfDataset(args.protocol, transform=transforms.Compose([
-        transforms.Resize((320, 240)),
+        transforms.Resize((224, 224)),
         transforms.ToTensor()
     ]))
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')

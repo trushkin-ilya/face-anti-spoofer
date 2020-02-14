@@ -1,9 +1,10 @@
 import os
+import re
+import torch
+
 from torch.utils.data import Dataset
 from torchvision import transforms
-import torch
 from PIL import Image
-import re
 
 
 class MfsdDataset(Dataset):
@@ -70,7 +71,6 @@ class CasiaSurfDataset(Dataset):
         img = Image.open(img_path)
         if self.transform:
             img = self.transform(img)
-        img = transforms.ToTensor()(img)
 
         return img, int(label)
 

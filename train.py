@@ -1,12 +1,13 @@
-from datasets import CasiaSurfDataset
+import os
+import argparse
+import utils
 import torch
+
+from datasets import CasiaSurfDataset
 from torch import optim, nn
 from torchvision import models, transforms
 from torch.utils import tensorboard
-import argparse
 from test import evaluate
-import os
-import utils
 
 
 def train(model, dataloader, loss_fn, optimizer):
@@ -38,8 +39,10 @@ if __name__ == '__main__':
     argparser.add_argument('--num_workers', type=int, default=0)
     args = argparser.parse_args()
 
-    dataset = CasiaSurfDataset(
-        args.protocol, transform=transforms.Resize((320, 240)))
+    dataset = CasiaSurfDataset(args.protocol, transform=transforms.Compose([
+        transforms.Resize((320, 240)),
+        transforms.ToTensor()
+    ]))
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
     dataloader = utils.SplittedDataLoader(dataset, train_batch_size=args.train_batch_size,
                                           val_batch_size=args.val_batch_size, num_workers=args.num_workers)

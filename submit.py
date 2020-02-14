@@ -1,11 +1,13 @@
 import argparse
-from torchvision import models
-from datasets import CasiaSurfDataset
-from torch.utils import data
+import numpy as np
+import pandas as pd
 import torch
 import torch.nn.functional as F
+
 from tqdm import tqdm
-import numpy as np
+from torchvision import models, transforms
+from datasets import CasiaSurfDataset
+from torch.utils import data
 
 
 if __name__ == '__main__':
@@ -35,28 +37,34 @@ The final merged file (for submission) contains a total of 600 lines. Each line 
     argparser.add_argument('--model2_path', type=str, required=True)
     argparser.add_argument('--model3_path', type=str, required=True)
     argparser.add_argument('--num_classes', type=int, default=2)
+    argparser.add_argument('--batch_size', type=int, default=1)
+    argparser.add_argument('--output', type=str, default='submission.txt')
     args = argparser.parse_args()
 
     model = models.mobilenet_v2(num_classes=args.num_classes)
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
-    with open('submission.txt', 'w+') as submission:
-        for protocol in [1, 2, 3]:
-            model.load_state_dict(torch.load(getattr(args, f'model{protocol}_path'), map_location=device))
-            model = model.to(device)
-            print(f"Evaluating protocol {protocol}...")
-            model.eval()
-            dataset = CasiaSurfDataset(protocol, train=False)
-            dataloader = data.DataLoader(dataset)
-            result = {}
-            with torch.no_grad():
-                for i, batch in enumerate(tqdm(dataloader)):
-                    inputs, labels = batch
-                    inputs = inputs.to(device)
-                    outputs = model(inputs)
-                    liveness_prob = F.softmax(outputs, dim=1)[0][1]
-                    video_id = dataset.get_video_id(i)
-                    if video_id not in result:
-                        result[video_id] = []
-                    result[video_id].append(liveness_prob)
-            for video_id, frame_probs in result.items():
-                submission.write(f'{video_id} {np.mean(frame_probs):.5f}\n')
+
+    for protocol in [1, 2, 3]:
+        model.load_state_dict(torch.load(getattr(args, f'model{protocol}_path'), map_location=device))
+        model = model.to(device)
+        print(f"Evaluating protocol {protocol}...")
+        model.eval()
+        dataset = CasiaSurfDataset(protocol, train=False, transform=transforms.Compose([
+            transforms.Resize((320, 240)),
+            transforms.ToTensor()
+        ]))
+        dataloader = data.DataLoader(dataset, batch_size=args.batch_size)
+        df = pd.DataFrame(columns=['prob', 'video_id'], index=np.arange(len(dataloader) * args.batch_size))
+        with torch.no_grad():
+            for i, (inputs, labels) in enumerate(tqdm(dataloader)):
+                inputs = inputs.to(device)
+                outputs = model(inputs)
+                liveness_prob = F.softmax(outputs, dim=1)[:, 1]
+                idx = np.arange(i * args.batch_size, (i + 1) * args.batch_size)
+                for j, p in zip(idx, liveness_prob):
+                    video_id = dataset.get_video_id(j)
+                    df.iloc[j] = {'prob': p.item(), 'video_id': video_id}
+
+        df.dropna(inplace=True)
+        df['prob'] = pd.to_numeric(df['prob'])
+        df.groupby('video_id').mean().to_csv(args.output, sep=' ', header=False, float_format='%.5f', mode='a')

@@ -1,12 +1,13 @@
-from datasets import CasiaSurfDataset
+import os
+import argparse
+import utils
 import torch
+
+from datasets import CasiaSurfDataset
 from torch import optim, nn
 from torchvision import models, transforms
 from torch.utils import tensorboard
-import argparse
 from test import evaluate
-import os
-import utils
 
 
 def train(model, dataloader, loss_fn, optimizer):
@@ -38,22 +39,27 @@ if __name__ == '__main__':
     argparser.add_argument('--num_workers', type=int, default=0)
     args = argparser.parse_args()
 
-    dataset = CasiaSurfDataset(
-        args.protocol, transform=transforms.Resize((320, 240)))
+    dataset = CasiaSurfDataset(args.protocol, transform=transforms.Compose([
+        transforms.Resize((320, 240)),
+        transforms.ToTensor()
+    ]))
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
-    dataloader = utils.SplittedDataLoader(dataset, train_batch_size=args.train_batch_size, val_batch_size=args.val_batch_size, num_workers=args.num_workers)
+    dataloader = utils.SplittedDataLoader(dataset, train_batch_size=args.train_batch_size,
+                                          val_batch_size=args.val_batch_size, num_workers=args.num_workers)
     model = models.mobilenet_v2(num_classes=args.num_classes)
     if args.checkpoint:
         model.load_state_dict(torch.load(args.checkpoint, map_location=device))
     model = model.to(device)
     print(model)
     writer = tensorboard.SummaryWriter()
+    optimizer = optim.Adam(model.parameters(), lr=args.lr)
+    scheduler = optim.lr_scheduler.ReduceLROnPlateau(optimizer)
 
     for epoch in range(args.epochs):
         train(model,
               dataloader=dataloader.train,
               loss_fn=nn.CrossEntropyLoss(),
-              optimizer=optim.Adam(model.parameters(), lr=args.lr))
+              optimizer=optimizer)
 
         if epoch % args.save_every == 0:
             file_name = f'mobilenet_v2_protocol{args.protocol}({epoch}).pt'
@@ -61,10 +67,13 @@ if __name__ == '__main__':
             torch.save(model.state_dict(), os.path.join(
                 args.save_path, file_name))
 
-        if epoch % args.eval_every == 0 and epoch > 0:
-            avg_loss, avg_acc = evaluate(dataloader.val, model)
+        if epoch % args.eval_every == 0:
+            apcer, bpcer, acer = evaluate(dataloader.val, model)
+            scheduler.step(acer)
             print(
-                f"\t\t\tValidation loss: {avg_loss}\t accuracy: {avg_acc}")
-            writer.add_scalar('Validation loss', avg_loss, epoch)
-            writer.add_scalar('Validation accuracy', avg_acc, epoch)
-            writer.close()
+                f"\t\t\tAPCER: {apcer}\t BPCER: {bpcer}\t ACER: {acer}")
+            writer.add_scalar('APCER', apcer, epoch)
+            writer.add_scalar('BPCER', bpcer, epoch)
+            writer.add_scalar('ACER', acer, epoch)
+            writer.add_scalar('Learning rate', optimizer.param_groups[0]['lr'])
+    writer.close()

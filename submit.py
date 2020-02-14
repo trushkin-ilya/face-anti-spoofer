@@ -57,8 +57,6 @@ The final merged file (for submission) contains a total of 600 lines. Each line 
         df = pd.DataFrame(columns=['prob', 'video_id'], index=np.arange(len(dataloader) * args.batch_size))
         with torch.no_grad():
             for i, (inputs, labels) in enumerate(tqdm(dataloader)):
-                if i > 2:
-                    break
                 inputs = inputs.to(device)
                 outputs = model(inputs)
                 liveness_prob = F.softmax(outputs, dim=1)[:, 1]

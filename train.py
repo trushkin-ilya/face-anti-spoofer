@@ -63,7 +63,7 @@ if __name__ == '__main__':
               optimizer=optimizer)
 
         if epoch % args.save_every == 0:
-            file_name = f'mobilenet_v2_protocol{args.protocol}({epoch}).pt'
+            file_name = f'MobileLiteNet54_se_p{args.protocol}({epoch}).pt'
             os.makedirs(args.save_path, exist_ok=True)
             torch.save(model.state_dict(), os.path.join(
                 args.save_path, file_name))

@@ -51,7 +51,7 @@ The final merged file (for submission) contains a total of 600 lines. Each line 
         print(f"Evaluating protocol {protocol}...")
         model.eval()
         dataset = CasiaSurfDataset(protocol, train=False, transform=transforms.Compose([
-            transforms.Resize((320, 240)),
+            transforms.Resize((224, 224)),
             transforms.ToTensor()
         ]))
         dataloader = data.DataLoader(dataset, batch_size=args.batch_size)

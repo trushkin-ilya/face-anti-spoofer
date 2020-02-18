@@ -21,7 +21,7 @@ def evaluate(dataloader: data.DataLoader, model: nn.Module, visualize: bool):
     model.eval()
     print("Evaluating...")
     tp, tn, fp, fn = 0, 0, 0, 0
-    errors = np.array([])
+    errors = np.array([], dtype=[('img', torch.Tensor), ('label', torch.Tensor), ('prob', float)])
     with torch.no_grad():
         for i, batch in enumerate(tqdm(dataloader)):
             images, labels = batch
@@ -33,7 +33,7 @@ def evaluate(dataloader: data.DataLoader, model: nn.Module, visualize: bool):
             if visualize:
                 errors_idx = np.where(torch.max(outputs.data, 1)[1] != labels)
                 print(errors_idx)
-                errors_imgs = list(zip(images[errors_idx], labels[errors_idx]))
+                errors_imgs = list(zip(images[errors_idx], labels[errors_idx], ))
                 print(errors_imgs)
                 errors = np.append(errors, errors_imgs)
 
@@ -45,13 +45,11 @@ def evaluate(dataloader: data.DataLoader, model: nn.Module, visualize: bool):
     bpcer = fn / (fn + tp) if fn != 0 else 0
     acer = (apcer + bpcer) / 2
     if visualize:
-        dtype = [('img', object), ('label', np.uint), ('prob', float)]
         print(errors)
-        errors = np.array(errors, dtype=dtype)
         errors.sort(order='prob')
         errors = np.flip(errors)
         print(errors)
-        plot_classes_preds(model, *errors)
+        plot_classes_preds(model, zip(*errors))
 
 
     return apcer, bpcer, acer

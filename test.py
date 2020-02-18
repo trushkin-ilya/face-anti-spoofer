@@ -32,7 +32,9 @@ def evaluate(dataloader: data.DataLoader, model: nn.Module, visualize: bool):
                                                                               labels=[0, 1]).ravel()
             if visualize:
                 errors_idx = np.where(torch.max(outputs.data, 1)[1] != labels)
+                print(errors_idx)
                 errors_imgs = list(zip(images[errors_idx], labels[errors_idx]))
+                print(errors_imgs)
                 errors = np.append(errors, errors_imgs)
 
             tp += tp_batch
@@ -44,9 +46,11 @@ def evaluate(dataloader: data.DataLoader, model: nn.Module, visualize: bool):
     acer = (apcer + bpcer) / 2
     if visualize:
         dtype = [('img', object), ('label', np.uint), ('prob', float)]
+        print(errors)
         errors = np.array(errors, dtype=dtype)
         errors.sort(order='prob')
         errors = np.flip(errors)
+        print(errors)
         plot_classes_preds(model, *errors)
 
 

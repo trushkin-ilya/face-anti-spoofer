@@ -8,6 +8,7 @@ from tqdm import tqdm
 from torchvision import models, transforms
 from datasets import CasiaSurfDataset
 from torch.utils import data
+from models.feathernets import MobileLiteNet54_se
 
 
 if __name__ == '__main__':
@@ -41,7 +42,7 @@ The final merged file (for submission) contains a total of 600 lines. Each line 
     argparser.add_argument('--output', type=str, default='submission.txt')
     args = argparser.parse_args()
 
-    model = models.mobilenet_v2(num_classes=args.num_classes)
+    model = MobileLiteNet54_se(num_classes=args.num_classes)
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
     for protocol in [1, 2, 3]:

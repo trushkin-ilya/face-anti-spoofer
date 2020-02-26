@@ -74,6 +74,7 @@ The final merged file (for submission) contains a total of 7,200 lines. Each lin
     argparser.add_argument('--num_classes', type=int, default=2)
     argparser.add_argument('--batch_size', type=int, default=1)
     argparser.add_argument('--output', type=str, default='submission.txt')
+    argparser.add_argument('--num_workers', type=int, default=0)
     args = argparser.parse_args()
 
     model = models.mobilenet_v2(num_classes=args.num_classes)
@@ -89,7 +90,7 @@ The final merged file (for submission) contains a total of 7,200 lines. Each lin
                 transforms.Resize((320, 240)),
                 transforms.ToTensor()
             ]))
-            dataloader = data.DataLoader(dataset, batch_size=args.batch_size)
+            dataloader = data.DataLoader(dataset, batch_size=args.batch_size, num_workers=args.num_workers)
             df = pd.DataFrame(columns=['prob', 'video_id'], index=np.arange(len(dataloader) * args.batch_size))
             with torch.no_grad():
                 for i, (inputs, labels) in enumerate(tqdm(dataloader)):

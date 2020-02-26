@@ -48,7 +48,7 @@ class CasiaSurfDataset(Dataset):
         file_name = f'4@{protocol}_{submode}.txt'
         with open(os.path.join(dir, file_name), 'r') as file:
             lines = file.readlines()
-            if mode == 'train':
+            if self.mode == 'train':
                 self.items = [tuple(line[:-1].split(' ')) for line in lines]
             else:
                 self.items = []
@@ -57,7 +57,7 @@ class CasiaSurfDataset(Dataset):
                     dir_name = os.path.join(path, 'profile')
                     for file_name in os.listdir(os.path.join(dir, dir_name)):
                         item = os.path.join(dir_name, file_name)
-                        self.items.append((item, -1 if mode == 'test' else label))
+                        self.items.append((item, -1 if self.mode == 'test' else label))
         self.transform = transform
 
     def __len__(self):

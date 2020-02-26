@@ -32,6 +32,41 @@ The final merged file (for submission) contains a total of 600 lines. Each line 
                 dev/003400 0.23394    #Note:  line 401- the first row of 4@3_dev_res.txt
                                 ......
                 dev/003599 0.23394    #Note:  line 600- the last row of 4@3_dev_res.txt
+                
+    Phase2: After phase1, we will release the testing data in phase2, plus the label of development data. A total of 6 score files need to be submitted:
+   (1) merge order：
+
+   4@1_dev_res.txt，4@1_test_res.txt, 4@2_dev_res.txt，4@2_test_res.txt, 4@3_dev_res.txt, 4@3_test_res.txt.
+
+   (2) merge method：
+
+   Continue straight by column. 
+
+The final merged file (for submission) contains a total of 7,200 lines. Each line in the file contains two parts separated by a space. Such as: 
+
+                  dev/003000 0.15361   #Note:  line 1- the first row of 4@1_dev_res.txt
+
+                                ......
+
+                  test/000001 0.94860   #Note:  line 201- the first row of 4@1_test_res.txt           
+
+                                ......
+
+                  dev/003200 0.40134   #Note:  line 2401- the first row of  4@2_dev_res.txt     
+
+                                ......   
+
+                  test/001201 0.23847   #Note:  line 2601- the first row of  4@2_test_res.txt
+
+                                ......
+
+                  dev/003400 0.23394   #Note:  line 4801- the first row of  4@3_dev_res.txt    
+
+                                ......
+
+                  test/001201 0.62544   #Note:  line 5001- the first row of  4@3_test_res.txt  
+
+                                 ......
     '''
     argparser = argparse.ArgumentParser()
     argparser.add_argument('--model1_path', type=str, required=True)
@@ -40,6 +75,7 @@ The final merged file (for submission) contains a total of 600 lines. Each line 
     argparser.add_argument('--num_classes', type=int, default=2)
     argparser.add_argument('--batch_size', type=int, default=1)
     argparser.add_argument('--output', type=str, default='submission.txt')
+    argparser.add_argument('--num_workers', type=int, default=0)
     args = argparser.parse_args()
 
     model = MobileLiteNet54_se(num_classes=args.num_classes)
@@ -50,21 +86,22 @@ The final merged file (for submission) contains a total of 600 lines. Each line 
         model = model.to(device)
         print(f"Evaluating protocol {protocol}...")
         model.eval()
-        dataset = CasiaSurfDataset(protocol, train=False, transform=transforms.Compose([
-            transforms.Resize((224, 224)),
-            transforms.ToTensor()
-        ]))
-        dataloader = data.DataLoader(dataset, batch_size=args.batch_size)
-        df = pd.DataFrame(columns=['prob', 'video_id'], index=np.arange(len(dataloader) * args.batch_size))
-        with torch.no_grad():
-            for i, (inputs, labels) in enumerate(tqdm(dataloader)):
-                inputs = inputs.to(device)
-                outputs = model(inputs)
-                liveness_prob = F.softmax(outputs, dim=1)[:, 1]
-                idx = np.arange(i * args.batch_size, (i + 1) * args.batch_size)
-                for j, p in zip(idx, liveness_prob):
-                    video_id = dataset.get_video_id(j)
-                    df.iloc[j] = {'prob': p.item(), 'video_id': video_id}
+        for mode in ['dev', 'test']:
+            dataset = CasiaSurfDataset(protocol, mode=mode, transform=transforms.Compose([
+                transforms.Resize((224, 224)),
+                transforms.ToTensor()
+            ]))
+            dataloader = data.DataLoader(dataset, batch_size=args.batch_size, num_workers=args.num_workers)
+            df = pd.DataFrame(columns=['prob', 'video_id'], index=np.arange(len(dataloader) * args.batch_size))
+            with torch.no_grad():
+                for i, (inputs, labels) in enumerate(tqdm(dataloader)):
+                    inputs = inputs.to(device)
+                    outputs = model(inputs)
+                    liveness_prob = F.softmax(outputs, dim=1)[:, 1]
+                    idx = np.arange(i * args.batch_size, (i + 1) * args.batch_size)
+                    for j, p in zip(idx, liveness_prob):
+                        video_id = dataset.get_video_id(j)
+                        df.iloc[j] = {'prob': p.item(), 'video_id': video_id}
 
         df.dropna(inplace=True)
         df['prob'] = pd.to_numeric(df['prob'])

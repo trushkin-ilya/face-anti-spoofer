@@ -11,7 +11,6 @@ from torch.utils import data
 from torchvision import models, transforms
 from tqdm import tqdm
 from datasets import CasiaSurfDataset
-from utils import SplittedDataLoader
 
 classes = ('Spoof', 'Live')
 
@@ -107,14 +106,15 @@ if __name__ == '__main__':
     argparser.add_argument('--num_classes', type=int, default=2)
     argparser.add_argument('--batch_size', type=int, default=1)
     argparser.add_argument('--visualize', type=bool, default=False)
+    argparser.add_argument('--num_workers', type=int, default=0)
     args = argparser.parse_args()
-    dataset = CasiaSurfDataset(args.protocol, dir=args.data_dir, transform=transforms.Compose([
+    dataset = CasiaSurfDataset(args.protocol, mode='dev', dir=args.data_dir, transform=transforms.Compose([
         transforms.Resize((320, 240)),
         transforms.ToTensor()
     ]))
-    dataloader = SplittedDataLoader(dataset, train_batch_size=1, val_batch_size=args.batch_size)
+    dataloader = data.DataLoader(dataset, batch_size=args.batch_size, num_workers=args.num_workers)
     model = models.mobilenet_v2(num_classes=args.num_classes)
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
     model.load_state_dict(torch.load(args.checkpoint, map_location=device))
-    apcer, bpcer, acer = evaluate(dataloader.val, model, args.visualize)
+    apcer, bpcer, acer = evaluate(dataloader, model, args.visualize)
     print(f'APCER: {apcer}, BPCER: {bpcer}, ACER: {acer}')

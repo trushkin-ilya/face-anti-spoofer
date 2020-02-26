@@ -1,13 +1,12 @@
 import os
 import argparse
-import utils
 import torch
 
 from datasets import CasiaSurfDataset
 from models.feathernets import MobileLiteNet54_se
 from torch import optim, nn
 from torchvision import models, transforms
-from torch.utils import tensorboard
+from torch.utils import tensorboard, data
 from test import evaluate
 
 
@@ -40,13 +39,14 @@ if __name__ == '__main__':
     argparser.add_argument('--num_workers', type=int, default=0)
     args = argparser.parse_args()
 
-    dataset = CasiaSurfDataset(args.protocol, transform=transforms.Compose([
+    train_data, val_data = (CasiaSurfDataset(args.protocol, mode=mode, transform=transforms.Compose([
         transforms.Resize((224, 224)),
         transforms.ToTensor()
-    ]))
+    ])) for mode in ('train', 'dev'))
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
-    dataloader = utils.SplittedDataLoader(dataset, train_batch_size=args.train_batch_size,
-                                          val_batch_size=args.val_batch_size, num_workers=args.num_workers)
+    train_loader = data.DataLoader(train_data, batch_size=args.train_batch_size, num_workers=args.num_workers)
+    val_loader = data.DataLoader(val_data, batch_size=args.val_batch_size, num_workers=args.num_workers)
+
     model = MobileLiteNet54_se(num_classes = args.num_classes)
     if args.checkpoint:
         model.load_state_dict(torch.load(args.checkpoint, map_location=device))
@@ -58,7 +58,7 @@ if __name__ == '__main__':
 
     for epoch in range(args.epochs):
         train(model,
-              dataloader=dataloader.train,
+              dataloader=train_loader,
               loss_fn=nn.CrossEntropyLoss(),
               optimizer=optimizer)
 
@@ -69,7 +69,7 @@ if __name__ == '__main__':
                 args.save_path, file_name))
 
         if epoch % args.eval_every == 0:
-            apcer, bpcer, acer = evaluate(dataloader.val, model)
+            apcer, bpcer, acer = evaluate(val_loader, model)
             scheduler.step(acer)
             print(
                 f"\t\t\tAPCER: {apcer}\t BPCER: {bpcer}\t ACER: {acer}")

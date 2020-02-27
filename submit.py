@@ -105,4 +105,5 @@ The final merged file (for submission) contains a total of 7,200 lines. Each lin
 
                 df.dropna(inplace=True)
                 df['prob'] = pd.to_numeric(df['prob'])
-                df.groupby('video_id').mean().to_csv(args.output, sep=' ', header=False, float_format='%.5f', mode='a')
+                df.groupby('video_id', sort=False).mean().to_csv(args.output, sep=' ', header=False,
+                                                                 float_format='%.5f', mode='a')

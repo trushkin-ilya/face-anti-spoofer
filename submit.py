@@ -103,6 +103,6 @@ The final merged file (for submission) contains a total of 7,200 lines. Each lin
                         video_id = dataset.get_video_id(j)
                         df.iloc[j] = {'prob': p.item(), 'video_id': video_id}
 
-        df.dropna(inplace=True)
-        df['prob'] = pd.to_numeric(df['prob'])
-        df.groupby('video_id').mean().to_csv(args.output, sep=' ', header=False, float_format='%.5f', mode='a')
+                df.dropna(inplace=True)
+                df['prob'] = pd.to_numeric(df['prob'])
+                df.groupby('video_id').mean().to_csv(args.output, sep=' ', header=False, float_format='%.5f', mode='a')

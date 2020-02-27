@@ -53,11 +53,11 @@ class CasiaSurfDataset(Dataset):
             else:
                 self.items = []
                 for line in lines:
-                    path, label = line[:-1].split(' ')
+                    path, *label = line[:-1].split(' ')
                     dir_name = os.path.join(path, 'profile')
                     for file_name in os.listdir(os.path.join(dir, dir_name)):
                         item = os.path.join(dir_name, file_name)
-                        self.items.append((item, -1 if self.mode == 'test' else label))
+                        self.items.append((item, -1 if self.mode == 'test' else label[0]))
         self.transform = transform
 
     def __len__(self):

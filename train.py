@@ -47,7 +47,7 @@ if __name__ == '__main__':
     train_loader = data.DataLoader(train_data, batch_size=args.train_batch_size, num_workers=args.num_workers)
     val_loader = data.DataLoader(val_data, batch_size=args.val_batch_size, num_workers=args.num_workers)
 
-    model = Ensemble(num_classes=args.num_classes)
+    model = Ensemble(device=device, num_classes=args.num_classes)
     if args.checkpoint:
         model.load_state_dict(torch.load(args.checkpoint, map_location=device))
     model = model.to(device)

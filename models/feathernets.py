@@ -257,13 +257,13 @@ class FeatherNet(nn.Module):
                 m.bias.data.zero_()
 
 
-def FeatherNetA():
-    model = FeatherNet(se=True)
+def FeatherNetA(**kwargs):
+    model = FeatherNet(se=True, **kwargs)
     return model
 
 
-def FeatherNetB():
-    model = FeatherNet(se=True, avgdown=True)
+def FeatherNetB(**kwargs):
+    model = FeatherNet(se=True, avgdown=True, **kwargs)
     return model
 
 

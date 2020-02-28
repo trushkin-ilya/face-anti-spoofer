@@ -1,6 +1,7 @@
 import torch
 from torch import nn
 import math
+import functools
 
 # reference form : https://github.com/moskomule/senet.pytorch
 class SELayer(nn.Module):
@@ -281,7 +282,4 @@ class Ensemble(nn.Module):
         self.device = device
 
     def forward(self, x):
-        output = torch.zeros([x.size(0), self.num_classes]).to(self.device)
-        for model in self.models:
-            output += model(x)
-        return output
+        return functools.reduce(lambda m1, m2: m1(x) + m2(x), self.models)

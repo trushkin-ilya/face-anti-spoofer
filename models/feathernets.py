@@ -22,43 +22,48 @@ class SELayer(nn.Module):
 
 # reference from https://github.com/tonylins/pytorch-mobilenet-v2/blob/master/MobileNetV2.py
 class InvertedResidual(nn.Module):
-    expansion = 1
-
-    def __init__(self, inplanes, planes, stride=1, downsample=None):
+    def __init__(self, inp, oup, stride, expand_ratio, downsample=None):
         super(InvertedResidual, self).__init__()
-        self.expansion = 6
-        self.conv1 = nn.Conv2d(inplanes, inplanes * self.expansion, kernel_size=1, bias=False)
-        self.bn1 = nn.BatchNorm2d(inplanes * self.expansion)
-        self.conv2 = nn.Conv2d(inplanes * self.expansion, inplanes * self.expansion, kernel_size=3, stride=stride,
-                               padding=1, groups=inplanes, bias=False)
-        self.bn2 = nn.BatchNorm2d(inplanes * self.expansion)
-        self.conv3 = nn.Conv2d(inplanes * self.expansion, planes, kernel_size=1, bias=False)
-        self.bn3 = nn.BatchNorm2d(planes)
-        self.relu = nn.ReLU6(inplace=True)
-        self.downsample = downsample
         self.stride = stride
+        assert stride in [1, 2]
+        self.downsample = downsample
+
+        hidden_dim = round(inp * expand_ratio)
+        self.use_res_connect = self.stride == 1 and inp == oup
+
+        if expand_ratio == 1:
+            self.conv = nn.Sequential(
+                # dw
+                nn.Conv2d(hidden_dim, hidden_dim, 3, stride, 1, groups=hidden_dim, bias=False),
+                nn.BatchNorm2d(hidden_dim),
+                nn.ReLU6(inplace=True),
+                # pw-linear
+                nn.Conv2d(hidden_dim, oup, 1, 1, 0, bias=False),
+                nn.BatchNorm2d(oup),
+            )
+        else:
+            self.conv = nn.Sequential(
+                # pw
+                nn.Conv2d(inp, hidden_dim, 1, 1, 0, bias=False),
+                nn.BatchNorm2d(hidden_dim),
+                nn.ReLU6(inplace=True),
+                # dw
+                nn.Conv2d(hidden_dim, hidden_dim, 3, stride, 1, groups=hidden_dim, bias=False),
+                nn.BatchNorm2d(hidden_dim),
+                nn.ReLU6(inplace=True),
+                # pw-linear
+                nn.Conv2d(hidden_dim, oup, 1, 1, 0, bias=False),
+                nn.BatchNorm2d(oup),
+            )
 
     def forward(self, x):
-        identity = x
-
-        out = self.conv1(x)
-        out = self.bn1(out)
-        out = self.relu(out)
-
-        out = self.conv2(out)
-        out = self.bn2(out)
-        out = self.relu(out)
-
-        out = self.conv3(out)
-        out = self.bn3(out)
-
-        if self.downsample is not None:
-            identity = self.downsample(x)
-
-        out += identity
-        out = out
-
-        return out
+        if self.use_res_connect:
+            return x + self.conv(x)
+        else:
+            if self.downsample is not None:
+                return self.downsample(x) + self.conv(x)
+            else:
+                return self.conv(x)
 
 class MobileLiteNet(nn.Module):
     def __init__(self, block, layers, num_classes, se=False):
@@ -100,7 +105,7 @@ class MobileLiteNet(nn.Module):
             )
 
         layers = []
-        layers.append(block(self.inplanes, planes, stride, downsample))
+        layers.append(block(self.inplanes, planes, stride, downsample=downsample))
         self.inplanes = planes * block.expansion
         for i in range(1, blocks):
             layers.append(block(self.inplanes, planes))

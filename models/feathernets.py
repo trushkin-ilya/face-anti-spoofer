@@ -1,3 +1,4 @@
+import torch
 from torch import nn
 import math
 
@@ -185,7 +186,7 @@ def conv_1x1_bn(inp, oup):
 
 
 class FeatherNet(nn.Module):
-    def __init__(self, n_class=2, input_size=224, se=False, avgdown=False, width_mult=1.):
+    def __init__(self, num_classes=2, input_size=224, se=False, avgdown=False, width_mult=1.):
         super(FeatherNet, self).__init__()
         block = InvertedResidual
         input_channel = 32
@@ -228,6 +229,7 @@ class FeatherNet(nn.Module):
         #         building last several layers
         self.final_DW = nn.Sequential(nn.Conv2d(input_channel, input_channel, kernel_size=3, stride=2, padding=1,
                                                 groups=input_channel, bias=False),
+                                      nn.Linear(input_channel, num_classes)
                                       )
 
         self._initialize_weights()
@@ -263,3 +265,19 @@ def FeatherNetA():
 def FeatherNetB():
     model = FeatherNet(se=True, avgdown=True)
     return model
+
+
+class Ensemble(nn.Module):
+    def __init__(self, device, num_classes=2):
+        super(Ensemble, self).__init__()
+
+        self.num_classes = num_classes
+        self.models = nn.ModuleList([FeatherNetA(num_classes=self.num_classes).to(device),
+                                     FeatherNetB(num_classes=self.num_classes).to(device)])
+        self.device = device
+
+    def forward(self, x):
+        output = torch.zeros([x.size(0), self.num_classes]).to(self.device)
+        for model in self.models:
+            output += model(x)
+        return output

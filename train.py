@@ -3,7 +3,7 @@ import argparse
 import torch
 
 from datasets import CasiaSurfDataset
-from models.feathernets import MobileLiteNet54_se
+from models.feathernets import Ensemble
 from torch import optim, nn
 from torchvision import models, transforms
 from torch.utils import tensorboard, data
@@ -47,7 +47,7 @@ if __name__ == '__main__':
     train_loader = data.DataLoader(train_data, batch_size=args.train_batch_size, num_workers=args.num_workers)
     val_loader = data.DataLoader(val_data, batch_size=args.val_batch_size, num_workers=args.num_workers)
 
-    model = MobileLiteNet54_se(num_classes = args.num_classes)
+    model = Ensemble(num_classes=args.num_classes)
     if args.checkpoint:
         model.load_state_dict(torch.load(args.checkpoint, map_location=device))
     model = model.to(device)

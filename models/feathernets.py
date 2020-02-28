@@ -233,8 +233,7 @@ class FeatherNet(nn.Module):
         self.features = nn.Sequential(*self.features)
         #         building last several layers
         self.final_DW = nn.Sequential(nn.Conv2d(input_channel, input_channel, kernel_size=3, stride=2, padding=1,
-                                                groups=input_channel, bias=False),
-                                      nn.Linear(input_channel, num_classes)
+                                                groups=input_channel, bias=False)
                                       )
 
         self._initialize_weights()

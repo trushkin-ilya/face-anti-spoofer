@@ -8,7 +8,7 @@ from tqdm import tqdm
 from torchvision import models, transforms
 from datasets import CasiaSurfDataset
 from torch.utils import data
-from models.feathernets import MobileLiteNet54_se
+from models.feathernets import Ensemble
 
 
 if __name__ == '__main__':
@@ -78,8 +78,9 @@ The final merged file (for submission) contains a total of 7,200 lines. Each lin
     argparser.add_argument('--num_workers', type=int, default=0)
     args = argparser.parse_args()
 
-    model = MobileLiteNet54_se(num_classes=args.num_classes)
+
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+    model = Ensemble(num_classes=args.num_classes, device=device)
 
     for protocol in [1, 2, 3]:
         model.load_state_dict(torch.load(getattr(args, f'model{protocol}_path'), map_location=device))

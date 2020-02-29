@@ -15,7 +15,7 @@ from datasets import CasiaSurfDataset
 classes = ('Spoof', 'Live')
 
 
-def evaluate(dataloader: data.DataLoader, model: nn.Module, visualize: bool):
+def evaluate(dataloader: data.DataLoader, model: nn.Module, visualize: bool = False):
     device = next(model.parameters()).device
     model.eval()
     print("Evaluating...")

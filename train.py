@@ -40,7 +40,9 @@ if __name__ == '__main__':
     args = argparser.parse_args()
 
     train_data, val_data = (CasiaSurfDataset(args.protocol, mode=mode, transform=transforms.Compose([
-        transforms.Resize((224, 224)),
+        transforms.Resize(256),
+        transforms.RandomCrop(224),
+        transforms.RandomHorizontalFlip(),
         transforms.ToTensor()
     ])) for mode in ('train', 'dev'))
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')

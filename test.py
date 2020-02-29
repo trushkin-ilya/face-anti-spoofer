@@ -109,7 +109,9 @@ if __name__ == '__main__':
     argparser.add_argument('--num_workers', type=int, default=0)
     args = argparser.parse_args()
     dataset = CasiaSurfDataset(args.protocol, mode='dev', dir=args.data_dir, transform=transforms.Compose([
-        transforms.Resize((320, 240)),
+        transforms.Resize(256),
+        transforms.RandomCrop(224),
+        transforms.RandomHorizontalFlip(),
         transforms.ToTensor()
     ]))
     dataloader = data.DataLoader(dataset, batch_size=args.batch_size, num_workers=args.num_workers)

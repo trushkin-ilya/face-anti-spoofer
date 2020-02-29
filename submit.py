@@ -88,7 +88,9 @@ The final merged file (for submission) contains a total of 7,200 lines. Each lin
         model.eval()
         for mode in ['dev', 'test']:
             dataset = CasiaSurfDataset(protocol, mode=mode, transform=transforms.Compose([
-                transforms.Resize((224, 224)),
+                transforms.Resize(256),
+                transforms.RandomCrop(224),
+                transforms.RandomHorizontalFlip(),
                 transforms.ToTensor()
             ]))
             dataloader = data.DataLoader(dataset, batch_size=args.batch_size, num_workers=args.num_workers)

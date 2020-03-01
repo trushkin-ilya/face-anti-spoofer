@@ -217,7 +217,7 @@ class Fish(nn.Module):
                                             has_score=(i == self.num_down), num_trans=num_trans, k=k, dilation=dilation,
                                             no_sampling=no_sampling)
             if i == self.depth - 1:
-                sample_block.extend(self._make_score(cur_planes + trans_planes, has_pool=True))
+                sample_block.extend(self._make_score(cur_planes + trans_planes, self.num_cls, has_pool=True))
             elif i == self.num_down:
                 sample_block.append(nn.Sequential(self._make_se_block(cur_planes * 2, cur_planes)))
 
@@ -556,6 +556,7 @@ class FeatherNet(nn.Module):
         self.final_DW = nn.Sequential(nn.Conv2d(input_channel, input_channel, kernel_size=3, stride=2, padding=1,
                                                 groups=input_channel, bias=False)
                                       )
+        self.classifier = nn.Linear(self.last_channel, num_classes)
 
         self._initialize_weights()
 
@@ -564,6 +565,7 @@ class FeatherNet(nn.Module):
         x = self.final_DW(x)
 
         x = x.view(x.size(0), -1)
+        x = self.classifier(x)
         return x
 
     def _initialize_weights(self):

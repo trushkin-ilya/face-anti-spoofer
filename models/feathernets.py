@@ -599,12 +599,12 @@ class Ensemble(nn.Module):
         super(Ensemble, self).__init__()
 
         self.num_classes = num_classes
-        self.models = nn.ModuleList([FeatherNetA(num_classes=self.num_classes).to(device),
-                                     FeatherNetB(num_classes=self.num_classes).to(device),
-                                     fishnet150(num_cls=self.num_classes).to(device),
-                                     models.mobilenet_v2(num_classes=self.num_classes).to(device),
-                                     MobileLiteNet54(num_classes=self.num_classes).to(device),
-                                     MobileLiteNet54_se(num_classes=self.num_classes).to(device)])
+        self.models = [FeatherNetA(num_classes=self.num_classes).to(device),
+                       FeatherNetB(num_classes=self.num_classes).to(device),
+                       fishnet150(num_cls=self.num_classes).to(device),
+                       models.mobilenet_v2(num_classes=self.num_classes).to(device),
+                       MobileLiteNet54(num_classes=self.num_classes).to(device),
+                       MobileLiteNet54_se(num_classes=self.num_classes).to(device)]
         self.device = device
 
     def forward(self, x):

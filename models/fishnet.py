@@ -1,13 +1,7 @@
 import torch
+import math
 from torch import nn
-from .blocks.bottleneck import Bottleneck
-
-'''
-FishNet
-Author: Shuyang Sun
-'''
-
-__all__ = ['fish']
+from .blocks import Bottleneck
 
 
 class Fish(nn.Module):
@@ -181,7 +175,7 @@ class Fish(nn.Module):
 
 
 class FishNet(nn.Module):
-    def __init__(self, block, **kwargs):
+    def __init__(self, block=Bottleneck, **kwargs):
         super(FishNet, self).__init__()
 
         inplanes = kwargs['network_planes'][0]
@@ -221,24 +215,18 @@ class FishNet(nn.Module):
         return out
 
 
-def fish(**kwargs):
-    return FishNet(Bottleneck, **kwargs)
+class FishNet150(FishNet):
+    def __init__(self, **kwargs):
+        net_cfg = {
+            #  input size:   [224, 56, 28,  14  |  7,   7,  14,  28 | 56,   28,  14]
+            # output size:   [56,  28, 14,   7  |  7,  14,  28,  56 | 28,   14,   7]
+            #                  |    |    |   |     |    |    |    |    |     |    |
+            'network_planes': [64, 128, 256, 512, 512, 512, 384, 256, 320, 832, 1600],
+            'num_res_blks': [2, 4, 8, 4, 2, 2, 2, 2, 2, 4],
+            'num_trans_blks': [2, 2, 2, 2, 2, 4],
+            'num_cls': 1000,
+            'num_down_sample': 3,
+            'num_up_sample': 3,
+        }
 
-
-def fishnet150(**kwargs):
-    """
-    :return:
-    """
-    net_cfg = {
-        #  input size:   [224, 56, 28,  14  |  7,   7,  14,  28 | 56,   28,  14]
-        # output size:   [56,  28, 14,   7  |  7,  14,  28,  56 | 28,   14,   7]
-        #                  |    |    |   |     |    |    |    |    |     |    |
-        'network_planes': [64, 128, 256, 512, 512, 512, 384, 256, 320, 832, 1600],
-        'num_res_blks': [2, 4, 8, 4, 2, 2, 2, 2, 2, 4],
-        'num_trans_blks': [2, 2, 2, 2, 2, 4],
-        'num_cls': 1000,
-        'num_down_sample': 3,
-        'num_up_sample': 3,
-    }
-    cfg = {**net_cfg, **kwargs}
-    return fish(**cfg)
+        super(FishNet150, self).__init__(**{**net_cfg, **kwargs})

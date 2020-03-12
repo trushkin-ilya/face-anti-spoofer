@@ -8,7 +8,7 @@ from tqdm import tqdm
 from torchvision import models, transforms
 from datasets import CasiaSurfDataset
 from torch.utils import data
-from models.feathernets import Ensemble
+from models import Ensemble
 
 
 if __name__ == '__main__':

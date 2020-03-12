@@ -2,7 +2,6 @@ from __future__ import division
 import math
 
 from torch import nn
-from torchvision import models
 from .blocks.inverted_residual import InvertedResidual
 from .blocks.conv_bn import conv_bn
 from .blocks.selayer import SELayer
@@ -79,13 +78,3 @@ class FeatherNet(nn.Module):
                 n = m.weight.size(1)
                 m.weight.data.normal_(0, 0.01)
                 m.bias.data.zero_()
-
-
-def FeatherNetA(**kwargs):
-    model = FeatherNet(se=True, **kwargs)
-    return model
-
-
-def FeatherNetB(**kwargs):
-    model = FeatherNet(se=True, avgdown=True, **kwargs)
-    return model

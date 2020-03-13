@@ -8,6 +8,7 @@ from tqdm import tqdm
 from torchvision import models, transforms
 from datasets import CasiaSurfDataset
 from torch.utils import data
+from models import Ensemble
 
 
 if __name__ == '__main__':
@@ -77,8 +78,9 @@ The final merged file (for submission) contains a total of 7,200 lines. Each lin
     argparser.add_argument('--num_workers', type=int, default=0)
     args = argparser.parse_args()
 
-    model = models.mobilenet_v2(num_classes=args.num_classes)
+
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+    model = Ensemble(num_classes=args.num_classes, device=device)
 
     for protocol in [1, 2, 3]:
         model.load_state_dict(torch.load(getattr(args, f'model{protocol}_path'), map_location=device))
@@ -87,7 +89,9 @@ The final merged file (for submission) contains a total of 7,200 lines. Each lin
         model.eval()
         for mode in ['dev', 'test']:
             dataset = CasiaSurfDataset(protocol, mode=mode, transform=transforms.Compose([
-                transforms.Resize((320, 240)),
+                transforms.Resize(256),
+                transforms.RandomCrop(224),
+                transforms.RandomHorizontalFlip(),
                 transforms.ToTensor()
             ]))
             dataloader = data.DataLoader(dataset, batch_size=args.batch_size, num_workers=args.num_workers)
@@ -102,6 +106,7 @@ The final merged file (for submission) contains a total of 7,200 lines. Each lin
                         video_id = dataset.get_video_id(j)
                         df.iloc[j] = {'prob': p.item(), 'video_id': video_id}
 
-        df.dropna(inplace=True)
-        df['prob'] = pd.to_numeric(df['prob'])
-        df.groupby('video_id').mean().to_csv(args.output, sep=' ', header=False, float_format='%.5f', mode='a')
+                df.dropna(inplace=True)
+                df['prob'] = pd.to_numeric(df['prob'])
+                df.groupby('video_id', sort=False).mean().to_csv(args.output, sep=' ', header=False,
+                                                                 float_format='%.5f', mode='a')

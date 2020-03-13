@@ -3,6 +3,7 @@ import argparse
 import torch
 
 from datasets import CasiaSurfDataset
+from models import Ensemble
 from torch import optim, nn
 from torchvision import models, transforms
 from torch.utils import tensorboard, data
@@ -38,15 +39,19 @@ if __name__ == '__main__':
     argparser.add_argument('--num_workers', type=int, default=0)
     args = argparser.parse_args()
 
+    device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+    model = Ensemble(device=device, num_classes=args.num_classes)
+
     train_data, val_data = (CasiaSurfDataset(args.protocol, mode=mode, transform=transforms.Compose([
-        transforms.Resize((320, 240)),
+        transforms.Resize(256),
+        transforms.RandomCrop(224),
+        transforms.RandomHorizontalFlip(),
         transforms.ToTensor()
     ])) for mode in ('train', 'dev'))
-    device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+
     train_loader = data.DataLoader(train_data, batch_size=args.train_batch_size, num_workers=args.num_workers)
     val_loader = data.DataLoader(val_data, batch_size=args.val_batch_size, num_workers=args.num_workers)
 
-    model = models.mobilenet_v2(num_classes=args.num_classes)
     if args.checkpoint:
         model.load_state_dict(torch.load(args.checkpoint, map_location=device))
     model = model.to(device)
@@ -62,7 +67,7 @@ if __name__ == '__main__':
               optimizer=optimizer)
 
         if epoch % args.save_every == 0:
-            file_name = f'mobilenet_v2_protocol{args.protocol}({epoch}).pt'
+            file_name = f'MobileLiteNet54_se_p{args.protocol}({epoch}).pt'
             os.makedirs(args.save_path, exist_ok=True)
             torch.save(model.state_dict(), os.path.join(
                 args.save_path, file_name))
@@ -75,5 +80,5 @@ if __name__ == '__main__':
             writer.add_scalar('APCER', apcer, epoch)
             writer.add_scalar('BPCER', bpcer, epoch)
             writer.add_scalar('ACER', acer, epoch)
-            writer.add_scalar('Learning rate', optimizer.param_groups[0]['lr'])
+            writer.add_scalar('Learning rate', optimizer.param_groups[0]['lr'], epoch)
     writer.close()

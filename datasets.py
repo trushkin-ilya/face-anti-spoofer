@@ -1,3 +1,4 @@
+import random
 import os
 import re
 import torch
@@ -41,23 +42,19 @@ class MfsdDataset(Dataset):
 
 
 class CasiaSurfDataset(Dataset):
-    def __init__(self, protocol: int, dir: str = 'data/CASIA_SURF', mode: str = 'train', transform=None):
+    def __init__(self, protocol: int, dir: str = 'data/CASIA_SURF', mode: str = 'train', depth=True, ir=True,
+                 transform=None):
         self.dir = dir
         self.mode = mode
         submode = {'train': 'train', 'dev': 'dev_ref', 'test': 'test_res'}[mode]
         file_name = f'4@{protocol}_{submode}.txt'
         with open(os.path.join(dir, file_name), 'r') as file:
             lines = file.readlines()
-            if self.mode == 'train':
-                self.items = [tuple(line[:-1].split(' ')) for line in lines]
-            else:
-                self.items = []
-                for line in lines:
-                    path, *label = line[:-1].split(' ')
-                    dir_name = os.path.join(path, 'profile')
-                    for file_name in os.listdir(os.path.join(dir, dir_name)):
-                        item = os.path.join(dir_name, file_name)
-                        self.items.append((item, -1 if self.mode == 'test' else label[0]))
+            self.items = []
+            for line in lines:
+                img_name, *label = tuple(line[:-1].split(' '))
+                self.items.append(
+                    (self.get_all_modalities(img_name, depth, ir), -1 if self.mode == 'test' else label[0]))
         self.transform = transform
 
     def __len__(self):
@@ -67,15 +64,27 @@ class CasiaSurfDataset(Dataset):
         if torch.is_tensor(idx):
             idx = idx.tolist()
 
-        img_name = self.items[idx][0]
-        label = self.items[idx][1]
-        img_path = os.path.join(self.dir, img_name)
-        img = Image.open(img_path)
-        if self.transform:
-            img = self.transform(img)
+        img_names, label = self.items[idx]
+        images = []
+        for img_name in img_names:
+            img_path = os.path.join(self.dir, img_name)
+            img = Image.open(img_path).convert('RGB' if 'profile' in img_path else 'L')
+            if self.transform:
+                random.seed(idx)
+                img = self.transform(img)
+            images += [img]
 
-        return img, int(label)
+        return images, int(label)
 
     def get_video_id(self, idx: int):
         img_name = self.items[idx][0]
         return re.search(rf'(?P<id>{self.mode}/\d+)', img_name).group('id')
+
+    def get_all_modalities(self, img_path: str, depth: bool = True, ir: bool = True) -> list:
+        result = [img_path]
+        if depth:
+            result += [re.sub('profile', 'depth', img_path)]
+        if ir:
+            result += [re.sub('profile', 'ir', img_path)]
+
+        return result

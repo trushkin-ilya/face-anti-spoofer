@@ -3,7 +3,7 @@ import argparse
 import torch
 
 from datasets import CasiaSurfDataset
-from models import Ensemble
+from models.fishnet import FishNet150
 from torch import optim, nn
 from torchvision import models, transforms
 from torch.utils import tensorboard, data
@@ -14,8 +14,9 @@ def train(model, dataloader, loss_fn, optimizer):
     model.train()
     for i, batch in enumerate(dataloader):
         images, labels = batch
+        big_images = torch.cat(images, dim=1)
         labels = torch.LongTensor(labels)
-        images, labels = images.to(device), labels.to(device)
+        images, labels = big_images.to(device), labels.to(device)
         outputs = model(images)
         loss = loss_fn(outputs, labels)
         print(
@@ -40,7 +41,7 @@ if __name__ == '__main__':
     args = argparser.parse_args()
 
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
-    model = Ensemble(device=device, num_classes=args.num_classes)
+    model = FishNet150(num_cls=args.num_classes).to(device)
 
     train_data, val_data = (CasiaSurfDataset(args.protocol, mode=mode, transform=transforms.Compose([
         transforms.Resize(256),

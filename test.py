@@ -7,20 +7,25 @@ from argparse import ArgumentParser
 from sklearn import metrics
 from torch import nn
 from torch.utils import data
-from torchvision import models, transforms
+from torchvision import transforms
 from tqdm import tqdm
 from datasets import CasiaSurfDataset
+from models.random_layer import RandomLayer
 
 
 def evaluate(dataloader: data.DataLoader, model: nn.Module, visualize: bool = False):
-    device = next(model.parameters()).device
+    device = torch.device('cpu')  # next(model.parameters()).device
     model.eval()
     print("Evaluating...")
+    live, spoof = 0, 0
     tp, tn, fp, fn = 0, 0, 0, 0
     errors = np.array([], dtype=[('img', torch.Tensor), ('label', torch.Tensor), ('prob', float)])
     with torch.no_grad():
         for i, batch in enumerate(tqdm(dataloader)):
             images, labels = batch
+            live_batch = torch.nonzero(labels).flatten().size(0)
+            live += live_batch
+            spoof += len(labels) - live_batch
             outputs = model(images.to(device))
             outputs = outputs.cpu()
             tn_batch, fp_batch, fn_batch, tp_batch = metrics.confusion_matrix(y_true=labels,
@@ -46,6 +51,7 @@ def evaluate(dataloader: data.DataLoader, model: nn.Module, visualize: bool = Fa
         errors = np.flip(errors)
         print(errors)
         utils.plot_classes_preds(model, zip(*errors))
+    print(live, spoof)
 
 
     return apcer, bpcer, acer
@@ -69,9 +75,12 @@ if __name__ == '__main__':
         transforms.RandomHorizontalFlip(),
         transforms.ToTensor()
     ]))
+    model = RandomLayer().to(torch.device('cpu'))
     dataloader = data.DataLoader(dataset, batch_size=args.batch_size, num_workers=args.num_workers)
-    model = models.mobilenet_v2(num_classes=args.num_classes)
+    #model = models.mobilenet_v2(num_classes=args.num_classes)
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
-    model.load_state_dict(torch.load(args.checkpoint, map_location=device))
-    apcer, bpcer, acer = evaluate(dataloader, model, args.visualize)
-    print(f'APCER: {apcer}, BPCER: {bpcer}, ACER: {acer}')
+    # model = torch.load(args.checkpoint, map_location=device)
+    # model.load_state_dict
+    for _ in range(4):
+        apcer, bpcer, acer = evaluate(dataloader, model, args.visualize)
+        print(f'APCER: {apcer:.3f}, BPCER: {bpcer:.3f}, ACER: {acer:.3f}')

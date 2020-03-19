@@ -57,11 +57,15 @@ class CasiaSurfDataset(Dataset):
                     self.items.append((self.get_all_modalities(img_name, depth, ir), label))
                 elif self.mode == 'dev':
                     folder_name, label = tuple(line[:-1].split(' '))
-                    for img_name in os.listdir(os.path.join(self.dir, folder_name, 'profile')):
+                    profile_dir = os.path.join(self.dir, folder_name, 'profile')
+                    for file in os.listdir(profile_dir):
+                        img_name = os.path.join(profile_dir, file)
                         self.items.append((self.get_all_modalities(img_name, depth, ir), label))
                 elif self.mode == 'test':
                     folder_name = line[:-1].split(' ')[0]
-                    for img_name in os.listdir(os.path.join(self.dir, folder_name, 'profile')):
+                    profile_dir = os.path.join(self.dir, folder_name, 'profile')
+                    for file in os.listdir(profile_dir):
+                        img_name = os.path.join(profile_dir, file)
                         self.items.append((self.get_all_modalities(img_name, depth, ir), -1))
         self.transform = transform
 

@@ -52,9 +52,17 @@ class CasiaSurfDataset(Dataset):
             lines = file.readlines()
             self.items = []
             for line in lines:
-                img_name, *label = tuple(line[:-1].split(' '))
-                self.items.append(
-                    (self.get_all_modalities(img_name, depth, ir), -1 if self.mode == 'test' else label[0]))
+                if self.mode == 'train':
+                    img_name, label = tuple(line[:-1].split(' '))
+                    self.items.append((self.get_all_modalities(img_name, depth, ir), label))
+                elif self.mode == 'dev':
+                    folder_name, label = tuple(line[:-1].split(' '))
+                    for img_name in os.listdir(os.path.join(self.dir, folder_name)):
+                        self.items.append((self.get_all_modalities(img_name, depth, ir), label))
+                elif self.mode == 'test':
+                    folder_name = line[:-1].split(' ')[0]
+                    for img_name in os.listdir(os.path.join(self.dir, folder_name)):
+                        self.items.append((self.get_all_modalities(img_name, depth, ir), -1))
         self.transform = transform
 
     def __len__(self):

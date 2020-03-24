@@ -62,11 +62,22 @@ if __name__ == '__main__':
     argparser.add_argument('--batch_size', type=int, default=1)
     argparser.add_argument('--visualize', type=bool, default=False)
     argparser.add_argument('--num_workers', type=int, default=0)
+    argparser.add_argument('--image_path', type=str, default='')
     args = argparser.parse_args()
+    if args.image_path:
+        from PIL import Image
+
+        from face_segmentation.utils.inference import predict_dense
+
+        segmentor = face_
+        img = Image.open(args.image_path)
+        mask_img = depths_img > 0
+        out = img_ori * mask_img[..., None]
+
+
     dataset = CasiaSurfDataset(args.protocol, mode='dev', dir=args.data_dir, transform=transforms.Compose([
         transforms.Resize(256),
-        transforms.RandomCrop(224),
-        transforms.RandomHorizontalFlip(),
+        transforms.CenterCrop(224),
         transforms.ToTensor()
     ]))
     dataloader = data.DataLoader(dataset, batch_size=args.batch_size, num_workers=args.num_workers)

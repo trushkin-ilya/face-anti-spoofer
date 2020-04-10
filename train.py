@@ -3,7 +3,7 @@ import argparse
 import torch
 
 from datasets import CasiaSurfDataset
-from models.fishnet import FishNet150
+from baseline.models import FeatherNetA
 from torch import optim, nn
 from torchvision import models, transforms
 from torch.utils import tensorboard, data
@@ -41,7 +41,7 @@ if __name__ == '__main__':
     args = argparser.parse_args()
 
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
-    model = FishNet150(num_cls=args.num_classes).to(device)
+    model = FeatherNetA(se=True, num_classes=args.num_classes)
 
     train_data, val_data = (CasiaSurfDataset(args.protocol, mode=mode, transform=transforms.Compose([
         transforms.Resize(256),

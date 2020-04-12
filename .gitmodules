@@ -1,0 +1,7 @@
+[submodule "baseline"]
+	path = baseline
+	url = https://github.com/trushkin-ilya/FeatherNets_Face-Anti-spoofing-Attack-Detection-Challenge-CVPR2019
+	branch = feathernet
+[submodule "face_segmentation"]
+	path = face_segmentation
+	url = https://github.com/trushkin-ilya/3DDFA.git

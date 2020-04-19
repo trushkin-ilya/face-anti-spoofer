@@ -46,19 +46,20 @@ if __name__ == '__main__':
 
     val_data = CasiaSurfDataset(args.protocol, dir=args.data_dir, mode='dev', depth=False, ir=False,
                                 transform=transforms.Compose([
-        transforms.Resize(256),
-        transforms.CenterCrop(224),
-        transforms.ToTensor()]))
+                                    transforms.Resize(256),
+                                    transforms.CenterCrop(224),
+                                    transforms.ToTensor()]))
 
     train_data = torch.utils.data.ConcatDataset(
         [CasiaSurfDataset(protocol, dir=args.data_dir, mode='train', depth=False, ir=False,
                           transform=transforms.Compose([
-            transforms.Resize(256),
-            transforms.RandomCrop(224),
-            transforms.RandomHorizontalFlip(),
-            transforms.ToTensor()])) for protocol in [1, 2, 3]])
+                              transforms.Resize(256),
+                              transforms.RandomCrop(224),
+                              transforms.RandomHorizontalFlip(),
+                              transforms.ToTensor()])) for protocol in [1, 2, 3]])
 
-    train_loader = data.DataLoader(train_data, batch_size=args.train_batch_size, num_workers=args.num_workers)
+    train_loader = data.DataLoader(train_data, batch_size=args.train_batch_size, num_workers=args.num_workers,
+                                   sampler=data.RandomSampler(train_data))
     val_loader = data.DataLoader(val_data, batch_size=args.val_batch_size, num_workers=args.num_workers)
 
     if args.checkpoint:

@@ -2,8 +2,7 @@ import os
 import argparse
 import torch
 
-from datasets import CasiaSurfDataset
-from baseline.models import FeatherNetA
+from baseline.datasets import CasiaSurfDataset
 from torch import optim, nn
 from torchvision import models, transforms
 from torch.utils import tensorboard, data
@@ -41,14 +40,19 @@ if __name__ == '__main__':
     args = argparser.parse_args()
 
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
-    model = FeatherNetA(se=True, num_classes=args.num_classes)
+    model = models.resnet18(pretrained=True, num_classes=args.num_classes)
 
-    train_data, val_data = (CasiaSurfDataset(args.protocol, mode=mode, transform=transforms.Compose([
+    val_data = CasiaSurfDataset(args.protocol, mode='dev', depth=False, ir=False, transform=transforms.Compose([
         transforms.Resize(256),
-        transforms.RandomCrop(224),
-        transforms.RandomHorizontalFlip(),
-        transforms.ToTensor()
-    ])) for mode in ('train', 'dev'))
+        transforms.CenterCrop(224),
+        transforms.ToTensor()]))
+
+    train_data = torch.utils.data.ConcatDataset(
+        [CasiaSurfDataset(protocol, mode='train', depth=False, ir=False, transform=transforms.Compose([
+            transforms.Resize(256),
+            transforms.RandomCrop(224),
+            transforms.RandomHorizontalFlip(),
+            transforms.ToTensor()])) for protocol in [1, 2, 3]])
 
     train_loader = data.DataLoader(train_data, batch_size=args.train_batch_size, num_workers=args.num_workers)
     val_loader = data.DataLoader(val_data, batch_size=args.val_batch_size, num_workers=args.num_workers)

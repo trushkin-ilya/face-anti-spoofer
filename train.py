@@ -37,18 +37,22 @@ if __name__ == '__main__':
     argparser.add_argument('--num_classes', type=int, default=2)
     argparser.add_argument('--save_every', type=int, default=1)
     argparser.add_argument('--num_workers', type=int, default=0)
+    argparser.add_argument('--data_dir', type=str, required=True)
     args = argparser.parse_args()
 
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
-    model = models.resnet18(pretrained=True, num_classes=args.num_classes)
+    model = models.resnet18(pretrained=True)
+    model.fc = nn.Linear(model.fc.in_features, args.num_classes)
 
-    val_data = CasiaSurfDataset(args.protocol, mode='dev', depth=False, ir=False, transform=transforms.Compose([
+    val_data = CasiaSurfDataset(args.protocol, dir=args.data_dir, mode='dev', depth=False, ir=False,
+                                transform=transforms.Compose([
         transforms.Resize(256),
         transforms.CenterCrop(224),
         transforms.ToTensor()]))
 
     train_data = torch.utils.data.ConcatDataset(
-        [CasiaSurfDataset(protocol, mode='train', depth=False, ir=False, transform=transforms.Compose([
+        [CasiaSurfDataset(protocol, dir=args.data_dir, mode='train', depth=False, ir=False,
+                          transform=transforms.Compose([
             transforms.Resize(256),
             transforms.RandomCrop(224),
             transforms.RandomHorizontalFlip(),

@@ -13,13 +13,14 @@ def train(model, dataloader, loss_fn, optimizer):
     model.train()
     for i, batch in enumerate(dataloader):
         images, labels = batch
-        big_images = torch.cat(images, dim=1)
         labels = torch.LongTensor(labels)
-        images, labels = big_images.to(device), labels.to(device)
+        images, labels = images.to(device), labels.to(device)
         outputs = model(images)
         loss = loss_fn(outputs, labels)
         print(
-            f'Epoch: {epoch + 1}/{args.epochs}\tBatch: {i + 1}/{len(dataloader)}\tLoss: {loss.item()}')
+            f'Epoch: {epoch + 1}/{args.epochs}\t',
+            f'Batch: {i + 1}/{len(dataloader)}\t',
+            f'Loss: {loss.item()}')
         loss.backward()
         optimizer.step()
 

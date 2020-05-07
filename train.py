@@ -2,10 +2,11 @@ import os
 import argparse
 import torch
 import numpy as np
+import models
 
 from baseline.datasets import CasiaSurfDataset, NonZeroCrop
 from torch import optim, nn
-from torchvision import transforms, models
+from torchvision import transforms
 from torch.utils import tensorboard, data
 from test import evaluate
 
@@ -52,7 +53,7 @@ if __name__ == '__main__':
     args = argparser.parse_args()
 
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
-    model = models.resnet18(num_classes=args.num_classes)
+    model = models.ResNet18_Dropout(num_classes=args.num_classes)
     model.fc = nn.Linear(model.fc.in_features, args.num_classes)
 
     val_data = CasiaSurfDataset(args.protocol, dir=args.data_dir, mode='dev', depth=False, ir=False,

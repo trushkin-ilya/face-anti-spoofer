@@ -96,7 +96,7 @@ if __name__ == '__main__':
               callback=lambda i: validation_callback(model, sub_val_loader, writer, i))
 
         if epoch % args.save_every == 0:
-            file_name = f'MobileLiteNet54_se_p{args.protocol}({epoch}).pt'
+            file_name = f'{model.__class__.__name__}_p{args.protocol}({epoch}).pt'
             os.makedirs(args.save_path, exist_ok=True)
             torch.save(model.state_dict(), os.path.join(
                 args.save_path, file_name))

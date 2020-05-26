@@ -1,16 +1,17 @@
 import os
 import argparse
 import torch
+import numpy as np
+import models
 
-from datasets import CasiaSurfDataset
-from models import Ensemble
+from baseline.datasets import CasiaSurfDataset, NonZeroCrop
 from torch import optim, nn
-from torchvision import models, transforms
+from torchvision import transforms
 from torch.utils import tensorboard, data
 from test import evaluate
 
 
-def train(model, dataloader, loss_fn, optimizer):
+def train(model, dataloader, loss_fn, optimizer, callback):
     model.train()
     for i, batch in enumerate(dataloader):
         images, labels = batch
@@ -19,14 +20,26 @@ def train(model, dataloader, loss_fn, optimizer):
         outputs = model(images)
         loss = loss_fn(outputs, labels)
         print(
-            f'Epoch: {epoch + 1}/{args.epochs}\tBatch: {i + 1}/{len(dataloader)}\tLoss: {loss.item()}')
+            f'Epoch: {epoch + 1}/{args.epochs}\t',
+            f'Batch: {i + 1}/{len(dataloader)}\t',
+            f'Loss: {loss.item()}')
         loss.backward()
         optimizer.step()
+
+
+def validation_callback(model, loader, writer, epoch):
+    apcer, bpcer, acer = evaluate(loader, model)
+    print(f"\t\t\tAPCER: {apcer}\t BPCER: {bpcer}\t ACER: {acer}")
+    writer.add_scalar('APCER', apcer, epoch)
+    writer.add_scalar('BPCER', bpcer, epoch)
+    writer.add_scalar('ACER', acer, epoch)
+    return acer
 
 
 if __name__ == '__main__':
     argparser = argparse.ArgumentParser()
     argparser.add_argument('--protocol', type=int, required=True)
+    argparser.add_argument('--model', type=str, required=True)
     argparser.add_argument('--epochs', type=int, default=10)
     argparser.add_argument('--checkpoint', type=str)
     argparser.add_argument('--train_batch_size', type=int, default=1)
@@ -37,20 +50,35 @@ if __name__ == '__main__':
     argparser.add_argument('--num_classes', type=int, default=2)
     argparser.add_argument('--save_every', type=int, default=1)
     argparser.add_argument('--num_workers', type=int, default=0)
+    argparser.add_argument('--data_dir', type=str, required=True)
     args = argparser.parse_args()
 
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
-    model = Ensemble(device=device, num_classes=args.num_classes)
+    model = getattr(models, args.model)(num_classes=args.num_classes)
 
-    train_data, val_data = (CasiaSurfDataset(args.protocol, mode=mode, transform=transforms.Compose([
-        transforms.Resize(256),
-        transforms.RandomCrop(224),
-        transforms.RandomHorizontalFlip(),
-        transforms.ToTensor()
-    ])) for mode in ('train', 'dev'))
+    val_data = CasiaSurfDataset(args.protocol, dir=args.data_dir, mode='dev', depth=False, ir=False,
+                                transform=transforms.Compose([
+                                    NonZeroCrop(),
+                                    transforms.Resize(256),
+                                    transforms.CenterCrop(224),
+                                    transforms.ToTensor()]))
 
-    train_loader = data.DataLoader(train_data, batch_size=args.train_batch_size, num_workers=args.num_workers)
-    val_loader = data.DataLoader(val_data, batch_size=args.val_batch_size, num_workers=args.num_workers)
+    train_data = torch.utils.data.ConcatDataset(
+        [CasiaSurfDataset(protocol, dir=args.data_dir, mode='train', depth=False, ir=False,
+                          transform=transforms.Compose([
+                              NonZeroCrop(),
+                              transforms.Resize(256),
+                              transforms.RandomCrop(224),
+                              transforms.RandomHorizontalFlip(),
+                              transforms.ToTensor()])) for protocol in [1, 2, 3]])
+
+    train_loader = data.DataLoader(train_data, batch_size=args.train_batch_size, num_workers=args.num_workers,
+                                   sampler=data.RandomSampler(train_data))
+    val_loader, sub_val_loader = [data.DataLoader(
+        val_data,
+        batch_size=args.val_batch_size,
+        num_workers=args.num_workers,
+        sampler=sampler) for sampler in [None, data.SubsetRandomSampler(np.random.choice(len(val_data), size=1000))]]
 
     if args.checkpoint:
         model.load_state_dict(torch.load(args.checkpoint, map_location=device))
@@ -64,21 +92,18 @@ if __name__ == '__main__':
         train(model,
               dataloader=train_loader,
               loss_fn=nn.CrossEntropyLoss(),
-              optimizer=optimizer)
+              optimizer=optimizer,
+              callback=lambda i: validation_callback(model, sub_val_loader, writer, i))
 
         if epoch % args.save_every == 0:
-            file_name = f'MobileLiteNet54_se_p{args.protocol}({epoch}).pt'
+            file_name = f'{model.__class__.__name__}_p{args.protocol}({epoch}).pt'
             os.makedirs(args.save_path, exist_ok=True)
             torch.save(model.state_dict(), os.path.join(
                 args.save_path, file_name))
 
         if epoch % args.eval_every == 0:
-            apcer, bpcer, acer = evaluate(val_loader, model)
+            acer = validation_callback(model, val_loader, writer, epoch)
             scheduler.step(acer)
-            print(
-                f"\t\t\tAPCER: {apcer}\t BPCER: {bpcer}\t ACER: {acer}")
-            writer.add_scalar('APCER', apcer, epoch)
-            writer.add_scalar('BPCER', bpcer, epoch)
-            writer.add_scalar('ACER', acer, epoch)
-            writer.add_scalar('Learning rate', optimizer.param_groups[0]['lr'], epoch)
+            writer.add_scalar(
+                'Learning rate', optimizer.param_groups[0]['lr'], epoch)
     writer.close()

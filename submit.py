@@ -5,8 +5,8 @@ import torch
 import torch.nn.functional as F
 
 from tqdm import tqdm
-from torchvision import models, transforms
-from datasets import CasiaSurfDataset
+from torchvision import transforms
+from baseline.datasets import CasiaSurfDataset
 from torch.utils import data
 from models import Ensemble
 

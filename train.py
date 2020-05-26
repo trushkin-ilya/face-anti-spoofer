@@ -39,6 +39,7 @@ def validation_callback(model, loader, writer, epoch):
 if __name__ == '__main__':
     argparser = argparse.ArgumentParser()
     argparser.add_argument('--protocol', type=int, required=True)
+    argparser.add_argument('--model', type=str, required=True)
     argparser.add_argument('--epochs', type=int, default=10)
     argparser.add_argument('--checkpoint', type=str)
     argparser.add_argument('--train_batch_size', type=int, default=1)
@@ -53,7 +54,7 @@ if __name__ == '__main__':
     args = argparser.parse_args()
 
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
-    model = models.ResNet18_Dropout(num_classes=args.num_classes)
+    model = getattr(models, args.model)(num_classes=args.num_classes)
     model.fc = nn.Linear(model.fc.in_features, args.num_classes)
 
     val_data = CasiaSurfDataset(args.protocol, dir=args.data_dir, mode='dev', depth=False, ir=False,

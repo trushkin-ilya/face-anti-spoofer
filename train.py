@@ -55,7 +55,6 @@ if __name__ == '__main__':
 
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
     model = getattr(models, args.model)(num_classes=args.num_classes)
-    model.fc = nn.Linear(model.fc.in_features, args.num_classes)
 
     val_data = CasiaSurfDataset(args.protocol, dir=args.data_dir, mode='dev', depth=False, ir=False,
                                 transform=transforms.Compose([

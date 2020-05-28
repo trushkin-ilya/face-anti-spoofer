@@ -132,6 +132,7 @@ def process_video(video_path, model, transform):
             color = (0, 255, 0) if liveness else (0, 0, 255)
             cv2.rectangle(
                 frame, (bbox[0], bbox[1]), (bbox[2], bbox[3]), color, 6)
+        cv2.imshow('frame', frame)
         out.write(frame)
 
         if cv2.waitKey(1) & 0xFF == ord('q'):

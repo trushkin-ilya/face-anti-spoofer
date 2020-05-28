@@ -2,10 +2,10 @@ import os
 import argparse
 import torch
 import numpy as np
-import models
+import models, optimizers, losses
+import yaml
 
 from baseline.datasets import CasiaSurfDataset, NonZeroCrop
-from torch import optim, nn
 from torchvision import transforms
 from torch.utils import tensorboard, data
 from test import evaluate
@@ -39,14 +39,12 @@ def validation_callback(model, loader, writer, epoch):
 if __name__ == '__main__':
     argparser = argparse.ArgumentParser()
     argparser.add_argument('--protocol', type=int, required=True)
-    argparser.add_argument('--model', type=str, required=True)
     argparser.add_argument('--epochs', type=int, default=10)
     argparser.add_argument('--checkpoint', type=str)
     argparser.add_argument('--train_batch_size', type=int, default=1)
     argparser.add_argument('--val_batch_size', type=int, default=1)
     argparser.add_argument('--eval_every', type=int, default=1)
-    argparser.add_argument('--save_path', type=str, required=True)
-    argparser.add_argument('--lr', type=float, default=3e-3)
+    argparser.add_argument('--save_path', type=str, default='checkpoints')
     argparser.add_argument('--num_classes', type=int, default=2)
     argparser.add_argument('--save_every', type=int, default=1)
     argparser.add_argument('--num_workers', type=int, default=0)
@@ -54,9 +52,10 @@ if __name__ == '__main__':
     argparser.add_argument('--depth', type=bool, default=False)
     argparser.add_argument('--ir', type=bool, default=False)
     args = argparser.parse_args()
+    config = yaml.load(open('config.yaml'),Loader=yaml.FullLoader)
 
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
-    model = getattr(models, args.model)(num_classes=args.num_classes)
+    model = getattr(models, config['model'])(num_classes=args.num_classes)
 
     val_data = CasiaSurfDataset(args.protocol, dir=args.data_dir, mode='dev', depth=args.depth, ir=args.ir,
                                 transform=transforms.Compose([
@@ -87,13 +86,13 @@ if __name__ == '__main__':
     model = model.to(device)
     print(model)
     writer = tensorboard.SummaryWriter()
-    optimizer = optim.Adam(model.parameters(), lr=args.lr)
-    scheduler = optim.lr_scheduler.ReduceLROnPlateau(optimizer)
+    optimizer = getattr(optimizers, config['optimizer']['class'])(model.parameters(), lr=float(config['optimizer']['lr']))
+    scheduler = getattr(optimizers.lr_scheduler, config['lr_scheduler'])(optimizer)
 
     for epoch in range(args.epochs):
         train(model,
               dataloader=train_loader,
-              loss_fn=nn.CrossEntropyLoss(),
+              loss_fn=getattr(losses, config['loss_fn'])(),
               optimizer=optimizer,
               callback=lambda i: validation_callback(model, sub_val_loader, writer, i))
 

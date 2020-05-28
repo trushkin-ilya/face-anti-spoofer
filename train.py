@@ -51,12 +51,14 @@ if __name__ == '__main__':
     argparser.add_argument('--save_every', type=int, default=1)
     argparser.add_argument('--num_workers', type=int, default=0)
     argparser.add_argument('--data_dir', type=str, required=True)
+    argparser.add_argument('--depth', type=bool, default=False)
+    argparser.add_argument('--ir', type=bool, default=False)
     args = argparser.parse_args()
 
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
     model = getattr(models, args.model)(num_classes=args.num_classes)
 
-    val_data = CasiaSurfDataset(args.protocol, dir=args.data_dir, mode='dev', depth=False, ir=False,
+    val_data = CasiaSurfDataset(args.protocol, dir=args.data_dir, mode='dev', depth=args.depth, ir=args.ir,
                                 transform=transforms.Compose([
                                     NonZeroCrop(),
                                     transforms.Resize(256),
@@ -64,7 +66,7 @@ if __name__ == '__main__':
                                     transforms.ToTensor()]))
 
     train_data = torch.utils.data.ConcatDataset(
-        [CasiaSurfDataset(protocol, dir=args.data_dir, mode='train', depth=False, ir=False,
+        [CasiaSurfDataset(protocol, dir=args.data_dir, mode='train', depth=args.depth, ir=args.ir,
                           transform=transforms.Compose([
                               NonZeroCrop(),
                               transforms.Resize(256),

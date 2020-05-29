@@ -1,4 +1,5 @@
 from .ensemble import Ensemble
+from torchvision.models import *
 from .feathernet import FeatherNetA, FeatherNetA_5ch
 from .resnet18_dropout import ResNet18_Dropout
 from .mobilelitenet import MobileLiteNet54, MobileLiteNet54_5ch

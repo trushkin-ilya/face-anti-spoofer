@@ -1,7 +1,7 @@
 from torch import nn
 from baseline.models.MobileLiteNet import MobileLiteNet54, MobileLiteNet54_se
 from .fishnet import FishNet150
-from .feathernet import FeatherNetA, FeatherNetB
+from baseline.models.FeatherNet import FeatherNetA, FeatherNetB
 from torchvision.models import MobileNetV2
 
 

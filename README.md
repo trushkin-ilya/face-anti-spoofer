@@ -16,7 +16,7 @@ Face anti-spoofing task solution using CASIA-SURF CeFA dataset, [FeatherNets](ht
 | ResNet18 with dropout | 13.95 | 883730 | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark: | Cross-entropy | 1e-3 | 0.0001 |
 | ResNet18 with dropout | 13.95 | 883730 | :heavy_check_mark: | :x: | :x: | Focal loss | 1e-4 | 0.0548 | 
 
-[TensorBoard](https://tensorboard.dev/experiment/vNCY4g2IRwylT08RDpydwQ/#scalars)
+[TensorBoard](https://tensorboard.dev/experiment/SoIKSMcbRniYID003q5glw/#scalars)
 
 ## Requirements
 * Python 3.7.6

@@ -32,9 +32,10 @@ class ResNet18_Dropout(ResNet):
         super(ResNet18_Dropout, self).__init__(
             block=BasicDropoutBlock, layers=[2, 2, 2, 2], **kwargs)
 
+
 class Resnet18_Dropout_5ch(ResNet18_Dropout):
     def __init__(self, **kwargs):
         super(Resnet18_Dropout_5ch, self).__init__(**kwargs)
 
         self.conv1 = nn.Conv2d(5, 64, kernel_size=7, stride=2, padding=3,
-                              bias=False)
+                               bias=False)

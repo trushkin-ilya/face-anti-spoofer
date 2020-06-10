@@ -10,7 +10,6 @@ from baseline.datasets import CasiaSurfDataset
 from torch.utils import data
 from models import Ensemble
 
-
 if __name__ == '__main__':
     '''
     Phase1: 4@1_train.txt，4@2_train.txt and 4@3_train.txt  are used to train the models 4@1，4@2 and 4@3 respectively.  Then,          

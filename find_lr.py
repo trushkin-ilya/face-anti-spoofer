@@ -52,5 +52,5 @@ if __name__ == '__main__':
     lrs = np.logspace(start=1, stop=10, base=0.1, num=100)
 
     plt.plot(lrs, [get_loss(lr, dataloader, args)
-                for lr in tqdm(lrs)])
+                   for lr in tqdm(lrs)])
     plt.show()

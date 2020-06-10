@@ -52,7 +52,7 @@ if __name__ == '__main__':
     argparser.add_argument('--depth', type=bool, default=False)
     argparser.add_argument('--ir', type=bool, default=False)
     args = argparser.parse_args()
-    config = yaml.load(open('config.yaml'),Loader=yaml.FullLoader)
+    config = yaml.load(open('config.yaml'), Loader=yaml.FullLoader)
 
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
     model = getattr(models, config['model'])(num_classes=args.num_classes)
@@ -86,7 +86,8 @@ if __name__ == '__main__':
     model = model.to(device)
     print(model)
     writer = tensorboard.SummaryWriter()
-    optimizer = getattr(optimizers, config['optimizer']['class'])(model.parameters(), lr=float(config['optimizer']['lr']))
+    optimizer = getattr(optimizers, config['optimizer']['class'])(model.parameters(),
+                                                                  lr=float(config['optimizer']['lr']))
     scheduler = getattr(optimizers.lr_scheduler, config['lr_scheduler'])(optimizer)
 
     for epoch in range(args.epochs):

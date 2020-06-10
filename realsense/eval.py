@@ -35,7 +35,6 @@ class RealSenseVideoEvaluator:
         self.classifier = model
         self.transform = transform
 
-
     def get_liveness(self, rgb_img, depth_img=None, ir_img=None):
         rects = self.face_detector(rgb_img, 1)
         tri = sio.loadmat('./face_segmentation/visualize/tri.mat')['tri']
@@ -52,7 +51,7 @@ class RealSenseVideoEvaluator:
             depths_img = cget_depths_image(rgb_img, [vertices], tri - 1)
             mask = (depths_img > 0).astype(np.uint8)
             mask = np.stack((mask,) * rgb_img.shape[-1], axis=-1)
-            imgs=[]
+            imgs = []
             for img in [rgb_img, depth_img, ir_img]:
                 if img is not None:
                     img = cv2.resize(img, dsize=(rgb_img.shape[1], rgb_img.shape[0]))
@@ -64,7 +63,6 @@ class RealSenseVideoEvaluator:
 
             outputs = self.classifier(input.unsqueeze(dim=0))
             yield np.array(roi_box).astype(int), torch.argmax(outputs).item()
-
 
     def process_rgb_video(self, video_path, output_path=None):
         ## create a device from device id and streams of interest

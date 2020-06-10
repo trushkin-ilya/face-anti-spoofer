@@ -65,27 +65,6 @@ class RealSenseVideoEvaluator:
             outputs = self.classifier(input.unsqueeze(dim=0))
             yield np.array(roi_box).astype(int), torch.argmax(outputs).item()
 
-    def convert_z16_to_bgr(self, frame):
-        '''Performs depth histogram normalization
-        This raw Python implementation is slow. See here for a fast implementation using Cython:
-        https://github.com/pupil-labs/pupil/blob/master/pupil_src/shared_modules/cython_methods/methods.pyx
-        '''
-        hist = np.histogram(frame, bins=0x10000)[0]
-        hist = np.cumsum(hist)
-        hist -= hist[0]
-        rgb_frame = np.empty(frame.shape[:2] + (3,), dtype=np.uint8)
-
-        zeros = frame == 0
-        non_zeros = frame != 0
-
-        f = hist[frame[non_zeros]] * 255 / hist[0xFFFF]
-        rgb_frame[non_zeros, 0] = 255 - f
-        rgb_frame[non_zeros, 1] = 0
-        rgb_frame[non_zeros, 2] = f
-        rgb_frame[zeros, 0] = 20
-        rgb_frame[zeros, 1] = 5
-        rgb_frame[zeros, 2] = 0
-        return rgb_frame
 
     def process_rgb_video(self, video_path, output_path=None):
         ## create a device from device id and streams of interest

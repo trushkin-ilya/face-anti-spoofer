@@ -64,6 +64,7 @@ Protocol must be either 1, 2 or 3. It determines CASIA-SURF benchmark sub-protoc
 
 ## Test
 ### CASIA-SURF
+![](https://storage.googleapis.com/groundai-web-prod/media/users/user_299614/project_411398/images/fig/eccv_fig0.png)
 1. Configure `./config.yaml`:
  * `model`: class name of used model. Class must be imported from `models` module.
 

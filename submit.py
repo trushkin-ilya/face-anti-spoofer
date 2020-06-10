@@ -10,7 +10,6 @@ from baseline.datasets import CasiaSurfDataset
 from torch.utils import data
 from models import Ensemble
 
-
 if __name__ == '__main__':
     '''
     Phase1: 4@1_train.txt，4@2_train.txt and 4@3_train.txt  are used to train the models 4@1，4@2 and 4@3 respectively.  Then,          
@@ -32,7 +31,7 @@ The final merged file (for submission) contains a total of 600 lines. Each line 
                 dev/003400 0.23394    #Note:  line 401- the first row of 4@3_dev_res.txt
                                 ......
                 dev/003599 0.23394    #Note:  line 600- the last row of 4@3_dev_res.txt
-                
+
     Phase2: After phase1, we will release the testing data in phase2, plus the label of development data. A total of 6 score files need to be submitted:
    (1) merge order：
 
@@ -76,14 +75,17 @@ The final merged file (for submission) contains a total of 7,200 lines. Each lin
     argparser.add_argument('--batch_size', type=int, default=1)
     argparser.add_argument('--output', type=str, default='submission.txt')
     argparser.add_argument('--num_workers', type=int, default=0)
-    args = argparser.parse_args()
 
+    argparser.add_argument('--depth', type=bool, default=False)
+    argparser.add_argument('--ir', type=bool, default=False)
+    args = argparser.parse_args()
 
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
     model = Ensemble(num_classes=args.num_classes, device=device)
 
     for protocol in [1, 2, 3]:
-        model.load_state_dict(torch.load(getattr(args, f'model{protocol}_path'), map_location=device))
+        model.load_state_dict(torch.load(
+            getattr(args, f'model{protocol}_path'), map_location=device))
         model = model.to(device)
         print(f"Evaluating protocol {protocol}...")
         model.eval()
@@ -93,15 +95,18 @@ The final merged file (for submission) contains a total of 7,200 lines. Each lin
                 transforms.RandomCrop(224),
                 transforms.RandomHorizontalFlip(),
                 transforms.ToTensor()
-            ]))
-            dataloader = data.DataLoader(dataset, batch_size=args.batch_size, num_workers=args.num_workers)
-            df = pd.DataFrame(columns=['prob', 'video_id'], index=np.arange(len(dataloader) * args.batch_size))
+            ]), depth=args.depth, ir=args.ir)
+            dataloader = data.DataLoader(
+                dataset, batch_size=args.batch_size, num_workers=args.num_workers)
+            df = pd.DataFrame(columns=['prob', 'video_id'], index=np.arange(
+                len(dataloader) * args.batch_size))
             with torch.no_grad():
                 for i, (inputs, labels) in enumerate(tqdm(dataloader)):
                     inputs = inputs.to(device)
                     outputs = model(inputs)
                     liveness_prob = F.softmax(outputs, dim=1)[:, 1]
-                    idx = np.arange(i * args.batch_size, (i + 1) * args.batch_size)
+                    idx = np.arange(i * args.batch_size,
+                                    (i + 1) * args.batch_size)
                     for j, p in zip(idx, liveness_prob):
                         video_id = dataset.get_video_id(j)
                         df.iloc[j] = {'prob': p.item(), 'video_id': video_id}

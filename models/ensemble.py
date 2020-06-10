@@ -1,7 +1,7 @@
 from torch import nn
-from .mobilelitenet import MobileLiteNet_se, MobileLiteNet
+from baseline.models.MobileLiteNet import MobileLiteNet54, MobileLiteNet54_se
 from .fishnet import FishNet150
-from .feathernet import FeatherNet
+from baseline.models.FeatherNet import FeatherNetA, FeatherNetB
 from torchvision.models import MobileNetV2
 
 
@@ -10,12 +10,12 @@ class Ensemble(nn.Module):
         super(Ensemble, self).__init__()
 
         self.num_classes = num_classes
-        self.models = [FeatherNet(se=True, num_classes=self.num_classes).to(device),
-                       FeatherNet(se=True, avgdown=True, num_classes=self.num_classes).to(device),
+        self.models = [FeatherNetA().to(device),
+                       FeatherNetB().to(device),
                        FishNet150(num_cls=self.num_classes).to(device),
                        MobileNetV2(num_classes=self.num_classes).to(device),
-                       MobileLiteNet(num_classes=self.num_classes).to(device),
-                       MobileLiteNet_se(num_classes=self.num_classes).to(device)]
+                       MobileLiteNet54().to(device),
+                       MobileLiteNet54_se().to(device)]
         self.device = device
 
     def forward(self, x):

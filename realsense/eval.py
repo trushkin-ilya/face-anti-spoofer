@@ -34,10 +34,10 @@ class RealSenseVideoEvaluator:
         self.segmentor_transform = transforms.Compose([ToTensorGjz(), NormalizeGjz(mean=127.5, std=128)])
         self.classifier = model
         self.transform = transform
+        self.tri = sio.loadmat('./face_segmentation/visualize/tri.mat')['tri']
 
     def get_liveness(self, rgb_img, depth_img=None, ir_img=None):
         rects = self.face_detector(rgb_img, 1)
-        tri = sio.loadmat('./face_segmentation/visualize/tri.mat')['tri']
         for rect in rects:
             pts = self.face_regressor(rgb_img, rect).parts()
             pts = np.array([[pt.x, pt.y] for pt in pts]).T
@@ -48,15 +48,16 @@ class RealSenseVideoEvaluator:
             param = self.segmentor(input)
             param = param.squeeze().cpu().numpy().flatten().astype(np.float32)
             vertices = predict_dense(param, roi_box)
-            depths_img = cget_depths_image(rgb_img, [vertices], tri - 1)
+            depths_img = cget_depths_image(rgb_img, [vertices], self.tri - 1)
             mask = (depths_img > 0).astype(np.uint8)
-            mask = np.stack((mask,) * rgb_img.shape[-1], axis=-1)
             imgs = []
             for img in [rgb_img, depth_img, ir_img]:
                 if img is not None:
-                    img = cv2.resize(img, dsize=(rgb_img.shape[1], rgb_img.shape[0]))
-                    img = cv2.multiply(img, mask)
-                    img = Image.fromarray(cv2.cvtColor(img, cv2.COLOR_BGR2RGB))
+                    if len(img.shape) == 2:
+                        img = np.expand_dims(img, axis=2)
+                    channeled_mask = np.stack((mask,) * img.shape[-1], axis=-1)
+                    img = cv2.multiply(img, channeled_mask)
+                    img = Image.fromarray(cv2.cvtColor(img, cv2.COLOR_BGR2RGB) if len(img.shape) > 2 else img)
                     img = self.transform(img)
                     imgs += [img]
             input = torch.cat(imgs, dim=0)
@@ -111,6 +112,35 @@ class RealSenseVideoEvaluator:
             cv2.imshow('frame', rgb_img)
 
             if writer:
+                writer.write(rgb_img)
+
+            if cv2.waitKey(1) & 0xFF == ord('q'):
+                break
+
+        cv2.destroyAllWindows()
+        if writer:
+            writer.release()
+
+    def process_4ch_video(self, video_prefix, output_path=None):
+        rgb_video = cv2.VideoCapture(f'{video_prefix}_rgb.mp4')
+        depth_video = cv2.VideoCapture(f'{video_prefix}_depth.mp4')
+        width = rgb_video.get(cv2.CAP_PROP_FRAME_WIDTH)
+        height = rgb_video.get(cv2.CAP_PROP_FRAME_HEIGHT)
+        fps = rgb_video.get(cv2.CAP_PROP_FPS)
+        fourcc = cv2.VideoWriter_fourcc('m', 'p', '4', 'v')
+        writer = cv2.VideoWriter(output_path, fourcc, fps, (int(width), int(height))) if output_path else None
+        while rgb_video.isOpened() and depth_video.isOpened():
+            # Capture frame-by-frame
+            _, rgb_img = rgb_video.read()
+            _, depth_img = depth_video.read()
+            depth_img = np.average(depth_img,axis=2).astype(np.uint8)
+            for bbox, liveness in self.get_liveness(rgb_img, depth_img):
+                color = (0, 255, 0) if liveness else (0, 0, 255)
+                cv2.rectangle(
+                    rgb_img, (bbox[0], bbox[1]), (bbox[2], bbox[3]), color, 6)
+            if not writer:
+                cv2.imshow('frame', rgb_img)
+            else:
                 writer.write(rgb_img)
 
             if cv2.waitKey(1) & 0xFF == ord('q'):

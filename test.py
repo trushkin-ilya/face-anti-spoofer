@@ -71,6 +71,8 @@ def main(args):
             evaluator = RealSenseVideoEvaluator(model, transform)
             if args.depth and args.ir:
                 evaluator.process_5ch_video(args.video_path, 'result.mp4')
+            elif args.depth:
+                evaluator.process_4ch_video(args.video_path, 'result.mp4')
             else:
                 evaluator.process_rgb_video(args.video_path, 'result.mp4')
             return

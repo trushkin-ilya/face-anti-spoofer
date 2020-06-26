@@ -1,4 +1,4 @@
-model: FeatherNetA
+model: FeatherNetA_4ch
 loss_fn: FocalLoss
 optimizer:
   class: Adam

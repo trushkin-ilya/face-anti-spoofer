@@ -19,7 +19,7 @@ Face anti-spoofing task solution using CASIA-SURF CeFA dataset, [FeatherNets](ht
 [TensorBoard](https://tensorboard.dev/experiment/SoIKSMcbRniYID003q5glw/#scalars)
 
 ## Demo
-![](https://github.com/trushkin-ilya/face-anti-spoofer/blob/only_depth/demo.gif)
+![](https://github.com/trushkin-ilya/face-anti-spoofer/blob/only_depth/out.gif)
 
 ## Requirements
 * Python 3.7.6

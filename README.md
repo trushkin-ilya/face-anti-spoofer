@@ -1,4 +1,8 @@
 # Face Anti-Spoofer
+<p align="center">
+  <img src="out.gif">
+</p>
+
 Face anti-spoofing task solution using CASIA-SURF CeFA dataset, [FeatherNets](https://github.com/trushkin-ilya/FeatherNets_Face-Anti-spoofing-Attack-Detection-Challenge-CVPR2019) and [Face Alignment in Full Pose Range](https://github.com/trushkin-ilya/3DDFA).
 
 | Model |  Params, M | Computational complexity, MFLOPs | RGB | Depth | IR |Loss function | Optimal LR | Minimal ACER (CASIA-SURF val) |
@@ -18,8 +22,6 @@ Face anti-spoofing task solution using CASIA-SURF CeFA dataset, [FeatherNets](ht
 
 [TensorBoard](https://tensorboard.dev/experiment/SoIKSMcbRniYID003q5glw/#scalars)
 
-## Demo
-![](https://github.com/trushkin-ilya/face-anti-spoofer/blob/only_depth/out.gif)
 
 ## Requirements
 * Python 3.7.6

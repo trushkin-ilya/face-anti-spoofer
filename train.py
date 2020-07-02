@@ -39,6 +39,7 @@ def validation_callback(model, loader, writer, epoch):
 if __name__ == '__main__':
     argparser = argparse.ArgumentParser()
     argparser.add_argument('--protocol', type=int, required=True)
+    argparser.add_argument('--config-path', type=str, required=True)
     argparser.add_argument('--epochs', type=int, default=10)
     argparser.add_argument('--checkpoint', type=str)
     argparser.add_argument('--train_batch_size', type=int, default=1)
@@ -52,7 +53,7 @@ if __name__ == '__main__':
     argparser.add_argument('--depth', type=bool, default=False)
     argparser.add_argument('--ir', type=bool, default=False)
     args = argparser.parse_args()
-    config = yaml.load(open('config.yaml'), Loader=yaml.FullLoader)
+    config = yaml.load(open(args.config_path), Loader=yaml.FullLoader)
 
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
     model = getattr(models, config['model'])(num_classes=args.num_classes)

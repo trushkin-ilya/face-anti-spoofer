@@ -8,11 +8,12 @@ import models
 if __name__ == '__main__':
     argparser = ArgumentParser()
     argparser.add_argument('--video-path', type=str, required=True)
+    argparser.add_argument('--config-path', type=str, required=True)
     argparser.add_argument('--depth', type=bool, default=False)
     argparser.add_argument('--ir', type=bool, default=False)
     argparser.add_argument('--depth', type=bool, default=False)
     argparser.add_argument('--num_classes', type=int, default=2)
-    config = yaml.load('config.yaml',Loader=yaml.FullLoader)
+    config = yaml.load('FeatherNetA_4ch_FL.yaml',Loader=yaml.FullLoader)
     args = argparser.parse_args()
     model = getattr(models, config['model'])(num_classes=args.num_classes)
     transform = transforms.Compose([

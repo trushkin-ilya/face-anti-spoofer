@@ -81,6 +81,7 @@ if __name__ == '__main__':
     argparser.add_argument('--data-dir', type=str,
                            default=os.path.join('data', 'CASIA_SURF'))
     argparser.add_argument('--checkpoint', type=str, required=True)
+    argparser.add_argument('--config-path', type=str, required=True)
     argparser.add_argument('--num_classes', type=int, default=2)
     argparser.add_argument('--batch_size', type=int, default=1)
     argparser.add_argument('--visualize', type=bool, default=False)
@@ -89,6 +90,6 @@ if __name__ == '__main__':
     argparser.add_argument('--depth', type=bool, default=False)
     argparser.add_argument('--ir', type=bool, default=False)
     args = argparser.parse_args()
-    config = yaml.load(open('config.yaml'), Loader=yaml.FullLoader)
+    config = yaml.load(open(args.config_path), Loader=yaml.FullLoader)
     args = Namespace(**vars(args), **config)
     main(args)

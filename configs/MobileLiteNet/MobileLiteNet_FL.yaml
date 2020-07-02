@@ -1,0 +1,6 @@
+model: MobileLiteNet54
+loss_fn: FocalLoss
+optimizer:
+  class: Adam
+  lr: 3e-7
+lr_scheduler: ReduceLROnPlateau

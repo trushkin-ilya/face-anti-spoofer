@@ -111,7 +111,7 @@ python test.py --checkpoint CHECKPOINT
 **WARNING:** Current evaluation for RealSense cameras was developed only for legacy devices which supported by [pyrealsense](https://github.com/toinsson/pyrealsense) library. Everything works fine for F200.
 #### Demo
 <p align="center">
-  <img src="out.gif">
+  <img src="misc/out.gif">
 </p>
 
 ## Submit

@@ -1,4 +1,4 @@
-# Face Anti-Spoofer ![](https://img.shields.io/badge/python-3.7-informational?logo=python) ![](https://img.shields.io/badge/PyTorch-1.4-informational?logo=pytorch)
+# Face Anti-Spoofer ![](https://img.shields.io/badge/python-3.7-informational?logo=python&logoColor=ccc) ![](https://img.shields.io/badge/PyTorch-1.4-informational?logo=pytorch&logoColor=ccc)
 Face anti-spoofing task solution using CASIA-SURF CeFA dataset, [FeatherNets](https://github.com/trushkin-ilya/FeatherNets_Face-Anti-spoofing-Attack-Detection-Challenge-CVPR2019) and [Face Alignment in Full Pose Range](https://github.com/trushkin-ilya/3DDFA).
 <!--ts-->
   * [Requirements](#requirements)

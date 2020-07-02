@@ -1,23 +1,19 @@
-# Face Anti-Spoofer
-<p align="center">
-  <img src="out.gif">
-</p>
-
-Face anti-spoofing task solution using CASIA-SURF CeFA dataset, [FeatherNets](https://github.com/trushkin-ilya/FeatherNets_Face-Anti-spoofing-Attack-Detection-Challenge-CVPR2019) and [Face Alignment in Full Pose Range](https://github.com/trushkin-ilya/3DDFA).
+# Face Anti-Spoofer ![](https://img.shields.io/badge/python-3.7-informational?logo=python) ![](https://img.shields.io/badge/PyTorch-1.4-informational?logo=pytorch)
 <!--ts-->
-   * [Face Anti-Spoofer](#face-anti-spoofer)
-      * [Demo](#demo)
-      * [Requirements](#requirements)
-      * [Setup](#setup)
-      * [Train](#train)
-      * [Test](#test)
-         * [CASIA-SURF](#casia-surf)
-         * [Intel® RealSense™ camera](#intel-realsense-camera)
-      * [Submit](#submit)
+  * [Demo](#demo)
+  * [Requirements](#requirements)
+  * [Setup](#setup)
+  * [Train](#train)
+  * [Test](#test)
+     * [CASIA-SURF](#casia-surf)
+     * [Intel® RealSense™ camera](#intel-realsense-camera)
+  * [Submit](#submit)
 
 <!-- Added by: itrushkin, at: Чт июл  2 22:19:07 MSK 2020 -->
 
 <!--te-->
+
+Face anti-spoofing task solution using CASIA-SURF CeFA dataset, [FeatherNets](https://github.com/trushkin-ilya/FeatherNets_Face-Anti-spoofing-Attack-Detection-Challenge-CVPR2019) and [Face Alignment in Full Pose Range](https://github.com/trushkin-ilya/3DDFA).
 
 | Model |  Params, M | Computational complexity, MFLOPs | RGB | Depth | IR |Loss function | Optimal LR | Minimal ACER (CASIA-SURF val) |
 | --- | --- | ---| --- | --- | --- | --- | --- | --- |
@@ -101,7 +97,7 @@ python test.py --protocol PROTOCOL
 ```
 Protocol must be either 1, 2 or 3. It determines CASIA-SURF benchmark sub-protocol of Protocol 4.
 
-### Intel® RealSense™ camera
+### Demo with Intel® RealSense™ camera
 1. Configure `./config.yaml`:
  * `model`: class name of used model. Class must be imported from `models` module.
 2. When you have the model, you can test it by running:
@@ -113,6 +109,11 @@ python test.py --checkpoint CHECKPOINT
                [--ir False]              
 ```
 **WARNING:** Current evaluation for RealSense cameras was developed only for legacy devices which supported by [pyrealsense](https://github.com/toinsson/pyrealsense) library. Everything works fine for F200.
+#### Demo
+<p align="center">
+  <img src="out.gif">
+</p>
+
 ## Submit
 Submission is made for Face Anti-spoofing Detection Challenge at CVPR2020.
 1. Run:

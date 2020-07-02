@@ -4,6 +4,20 @@
 </p>
 
 Face anti-spoofing task solution using CASIA-SURF CeFA dataset, [FeatherNets](https://github.com/trushkin-ilya/FeatherNets_Face-Anti-spoofing-Attack-Detection-Challenge-CVPR2019) and [Face Alignment in Full Pose Range](https://github.com/trushkin-ilya/3DDFA).
+<!--ts-->
+   * [Face Anti-Spoofer](#face-anti-spoofer)
+      * [Demo](#demo)
+      * [Requirements](#requirements)
+      * [Setup](#setup)
+      * [Train](#train)
+      * [Test](#test)
+         * [CASIA-SURF](#casia-surf)
+         * [Intel® RealSense™ camera](#intel-realsense-camera)
+      * [Submit](#submit)
+
+<!-- Added by: itrushkin, at: Чт июл  2 22:19:07 MSK 2020 -->
+
+<!--te-->
 
 | Model |  Params, M | Computational complexity, MFLOPs | RGB | Depth | IR |Loss function | Optimal LR | Minimal ACER (CASIA-SURF val) |
 | --- | --- | ---| --- | --- | --- | --- | --- | --- |

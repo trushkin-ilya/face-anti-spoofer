@@ -66,17 +66,6 @@ def main(args):
     ])
     model.eval()
     with torch.no_grad():
-        if args.video_path:
-            from realsense.eval import RealSenseVideoEvaluator
-            evaluator = RealSenseVideoEvaluator(model, transform)
-            if args.depth and args.ir:
-                evaluator.process_5ch_video(args.video_path, 'result.mp4')
-            elif args.depth:
-                evaluator.process_4ch_video(args.video_path, 'result.mp4')
-            else:
-                evaluator.process_rgb_video(args.video_path, 'result.mp4')
-            return
-
         dataset = CasiaSurfDataset(
             args.protocol, mode='dev', dir=args.data_dir, transform=transform, depth=args.depth, ir=args.ir)
         dataloader = data.DataLoader(

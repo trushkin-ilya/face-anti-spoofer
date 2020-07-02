@@ -45,70 +45,43 @@ Face anti-spoofing task solution using CASIA-SURF CeFA dataset, [FeatherNets](ht
 ln -s <your_path_to_CASIA> ./data/CASIA_SURF
 ```
 3. Install requirements:
-`pip install -r requirements.txt`
+```pip install -r requirements.txt```
 
 
 ## Train
-1. Configure training process. In `./config.yaml` specify keys:
-    * `model`: class name of used model. Class must be imported from `models` module.
-    * `loss_fn`: loss function to use during training process. Must be imported from `./losses.py`.
-    * section `optimizer:`
-        * ` class`: class name of used optimizer. Must be imported from `./optimizers.py`.
-        * `lr`: optimizer learning rate parameter value.
-    * `lr_scheduler`: PyTorch learning rate scheduler class name.
-        
 
-2. Tensorboard logs will be written to `./runs` folder. To monitor them during training process, run:
+1. Tensorboard logs will be written to `./runs` folder. To monitor them during training process, run:
 ```
 tensorboard --logdir runs
 ```
 
-3. Run training process:
+2. Run training process:
 ```
-python train.py --protocol PROTOCOL
-                --checkpoint CHECKPOINT 
-                [--epochs 10]
-                [--train_batch_size 1]
-                [--val_batch_size 1] 
-                [--eval_every 1]
-                [--save_path checkpoints] 
-                [--num_classes 2]
-                [--save_every 1]
-                [--num_workers 0]
+python train.py --protocol PROTOCOL --config-path CONFIG_PATH --data_dir DATA_DIR
+                [--epochs 10] [--checkpoint ''] [--train_batch_size 1]
+                [--val_batch_size 1] [--eval_every 1] [--save_path checkpoints]
+                [--num_classes NUM_CLASSES] [--save_every 1] [--num_workers 0]
+                [--depth False] [--ir False]
 ```
 Protocol must be either 1, 2 or 3. It determines CASIA-SURF benchmark sub-protocol of Protocol 4.
 
 ## Test
 ### CASIA-SURF
 ![](https://storage.googleapis.com/groundai-web-prod/media/users/user_299614/project_411398/images/fig/eccv_fig0.png)
-1. Configure `./config.yaml`:
- * `model`: class name of used model. Class must be imported from `models` module.
-
-2. When you have the model, you can test it by running:
+1. When you have the model, you can test it by running:
 ```
-python test.py --protocol PROTOCOL
-               --checkpoint CHECKPOINT
-               [--data-dir ./data/CASIA_SURF]
-               [--num_classes 2]
-               [--batch_size 1]
-               [--visualize False]
-               [--num_workers 0]
-               [--depth False]
-               [--ir False]
+python test.py --protocol PROTOCOL --checkpoint CHECKPOINT --config-path CONFIG_PATH 
+               [--data-dir DATA_DIR] [--num_classes NUM_CLASSES] [--batch_size BATCH_SIZE]
+               [--visualize VISUALIZE] [--num_workers NUM_WORKERS] [--video_path VIDEO_PATH]
+               [--depth DEPTH] [--ir IR]
 ```
 Protocol must be either 1, 2 or 3. It determines CASIA-SURF benchmark sub-protocol of Protocol 4.
 
 ### Demo with Intel® RealSense™ camera
 #### Running
-1. Configure `./config.yaml`:
- * `model`: class name of used model. Class must be imported from `models` module.
-2. When you have the model, you can test it by running:
 ```
-python test.py --checkpoint CHECKPOINT
-               --video_path VIDEO_PATH
-               [--num_classes 2]
-               [--depth False]
-               [--ir False]              
+python realsense_demo.py --video-path VIDEO_PATH --config-path CONFIG_PATH [--depth DEPTH]
+                         [--ir IR] [--num_classes NUM_CLASSES]
 ```
 **WARNING:** Current evaluation for RealSense cameras was developed only for legacy devices which supported by [pyrealsense](https://github.com/toinsson/pyrealsense) library. Everything works fine for F200.
 #### Demo
@@ -120,13 +93,7 @@ python test.py --checkpoint CHECKPOINT
 Submission is made for Face Anti-spoofing Detection Challenge at CVPR2020.
 1. Run:
 ```
-python submit.py --model1_path MODEL1_PATH
-                 --model2_path MODEL2_PATH
-                 --model3_path MODEL3_PATH
-                 [--num_classes 2]
-                 [--batch_size 1]
-                 [--output ./submission.txt]
-                 [--num_workers 0]
-                 [--depth False]
-                 [--ir False]
+python submit.py --model1_path MODEL1_PATH --model2_path MODEL2_PATH --model3_path MODEL3_PATH 
+                 [--num_classes 2] [--batch_size 1] [--output submission.txt]
+                 [--num_workers 0] [--depth False] [--ir False]
 ```

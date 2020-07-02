@@ -5,10 +5,10 @@ import numpy as np
 import models, optimizers, losses
 import yaml
 
-from baseline.datasets import CasiaSurfDataset, NonZeroCrop
-from torchvision import transforms
+from baseline.datasets import CasiaSurfDataset
 from torch.utils import tensorboard, data
 from test import evaluate
+from transforms import ValidationTransform, TrainTransform
 
 
 def train(model, dataloader, loss_fn, optimizer, callback):
@@ -59,20 +59,11 @@ if __name__ == '__main__':
     model = getattr(models, config['model'])(num_classes=args.num_classes)
 
     val_data = CasiaSurfDataset(args.protocol, dir=args.data_dir, mode='dev', depth=args.depth, ir=args.ir,
-                                transform=transforms.Compose([
-                                    NonZeroCrop(),
-                                    transforms.Resize(256),
-                                    transforms.CenterCrop(224),
-                                    transforms.ToTensor()]))
+                                transform=ValidationTransform())
 
     train_data = torch.utils.data.ConcatDataset(
         [CasiaSurfDataset(protocol, dir=args.data_dir, mode='train', depth=args.depth, ir=args.ir,
-                          transform=transforms.Compose([
-                              NonZeroCrop(),
-                              transforms.Resize(256),
-                              transforms.RandomCrop(224),
-                              transforms.RandomHorizontalFlip(),
-                              transforms.ToTensor()])) for protocol in [1, 2, 3]])
+                          transform=TrainTransform()) for protocol in [1, 2, 3]])
 
     train_loader = data.DataLoader(train_data, batch_size=args.train_batch_size, num_workers=args.num_workers,
                                    sampler=data.RandomSampler(train_data))

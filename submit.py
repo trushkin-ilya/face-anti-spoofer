@@ -5,10 +5,10 @@ import torch
 import torch.nn.functional as F
 
 from tqdm import tqdm
-from torchvision import transforms
 from baseline.datasets import CasiaSurfDataset
 from torch.utils import data
 from models import Ensemble
+from transforms import ValidationTransform
 
 if __name__ == '__main__':
     '''
@@ -90,12 +90,7 @@ The final merged file (for submission) contains a total of 7,200 lines. Each lin
         print(f"Evaluating protocol {protocol}...")
         model.eval()
         for mode in ['dev', 'test']:
-            dataset = CasiaSurfDataset(protocol, mode=mode, transform=transforms.Compose([
-                transforms.Resize(256),
-                transforms.RandomCrop(224),
-                transforms.RandomHorizontalFlip(),
-                transforms.ToTensor()
-            ]), depth=args.depth, ir=args.ir)
+            dataset = CasiaSurfDataset(protocol, mode=mode, transform=ValidationTransform(), depth=args.depth, ir=args.ir)
             dataloader = data.DataLoader(
                 dataset, batch_size=args.batch_size, num_workers=args.num_workers)
             df = pd.DataFrame(columns=['prob', 'video_id'], index=np.arange(

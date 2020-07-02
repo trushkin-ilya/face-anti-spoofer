@@ -1,6 +1,5 @@
-from baseline.datasets import CasiaSurfDataset, NonZeroCrop
+from baseline.datasets import CasiaSurfDataset
 from tqdm import tqdm
-from torchvision import transforms
 import models
 from torch.utils import data
 from torch import nn
@@ -11,6 +10,8 @@ import numpy as np
 import torch
 import os
 import yaml
+
+from transforms import ValidationTransform
 
 
 def evaluate(dataloader: data.DataLoader, model: nn.Module, visualize: bool = False):
@@ -58,16 +59,10 @@ def main(args):
     model = getattr(models, args.model)(num_classes=args.num_classes)
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
     model.load_state_dict(torch.load(args.checkpoint, map_location=device))
-    transform = transforms.Compose([
-        NonZeroCrop(),
-        transforms.Resize(256),
-        transforms.CenterCrop(224),
-        transforms.ToTensor()
-    ])
     model.eval()
     with torch.no_grad():
         dataset = CasiaSurfDataset(
-            args.protocol, mode='dev', dir=args.data_dir, transform=transform, depth=args.depth, ir=args.ir)
+            args.protocol, mode='dev', dir=args.data_dir, transform=ValidationTransform(), depth=args.depth, ir=args.ir)
         dataloader = data.DataLoader(
             dataset, batch_size=args.batch_size, num_workers=args.num_workers)
 

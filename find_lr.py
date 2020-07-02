@@ -1,5 +1,4 @@
 from baseline.datasets import CasiaSurfDataset
-from torchvision import transforms
 from torch.utils import data
 import torch
 import matplotlib.pyplot as plt
@@ -7,9 +6,10 @@ from argparse import ArgumentParser
 import models
 import losses
 import optimizers
-from baseline.datasets import NonZeroCrop
 import math
 from tqdm import tqdm
+
+from transforms import TrainTransform
 
 
 def find_lr(loader, net, optimizer, criterion, init_value=3e-10, final_value=3., beta=0.98):
@@ -60,12 +60,7 @@ if __name__ == '__main__':
 
     dataset = torch.utils.data.ConcatDataset(
         [CasiaSurfDataset(protocol, mode='train', depth=args.depth, ir=args.ir,
-                          transform=transforms.Compose([
-                              NonZeroCrop(),
-                              transforms.Resize(256),
-                              transforms.RandomCrop(224),
-                              transforms.RandomHorizontalFlip(),
-                              transforms.ToTensor()])) for protocol in [1, 2, 3]])
+                          transform=TrainTransform()) for protocol in [1, 2, 3]])
     dataloader = data.DataLoader(
         dataset, sampler=data.sampler.RandomSampler(dataset), batch_size=32)
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')

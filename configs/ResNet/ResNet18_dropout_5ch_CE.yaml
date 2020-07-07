@@ -1,0 +1,6 @@
+model: ResNet18_Dropout
+loss_fn: CrossEntropyLoss
+optimizer:
+  class: Adam
+  lr: 1e-4
+lr_scheduler: ReduceLROnPlateau

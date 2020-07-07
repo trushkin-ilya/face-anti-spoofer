@@ -1,15 +1,16 @@
-import torch
 import cv2
+import dlib
 import numpy as np
 import scipy.io as sio
-import dlib
-
+import torch
+import torch.nn.functional as F
+from PIL import Image
 from torchvision import transforms
-from face_segmentation.utils.inference import crop_img, parse_roi_box_from_landmark, predict_dense
-from face_segmentation.utils.render import cget_depths_image
+
 from face_segmentation import mobilenet_v1
 from face_segmentation.utils.ddfa import ToTensorGjz, NormalizeGjz
-from PIL import Image
+from face_segmentation.utils.inference import crop_img, parse_roi_box_from_landmark, predict_dense
+from face_segmentation.utils.render import cget_depths_image
 
 
 class RealSenseVideoEvaluator:
@@ -63,7 +64,7 @@ class RealSenseVideoEvaluator:
             input = torch.cat(imgs, dim=0)
 
             outputs = self.classifier(input.unsqueeze(dim=0))
-            yield np.array(roi_box).astype(int), torch.argmax(outputs).item()
+            yield np.array(roi_box).astype(int), torch.argmax(outputs).item(), F.softmax(outputs, dim=1).max().item()
 
     def process_rgb_video(self, video_path, output_path=None):
         ## create a device from device id and streams of interest
@@ -134,10 +135,14 @@ class RealSenseVideoEvaluator:
             _, rgb_img = rgb_video.read()
             _, depth_img = depth_video.read()
             depth_img = np.average(depth_img,axis=2).astype(np.uint8)
-            for bbox, liveness in self.get_liveness(rgb_img, depth_img):
+            for bbox, liveness, prob in self.get_liveness(rgb_img, depth_img):
                 color = (0, 255, 0) if liveness else (0, 0, 255)
-                cv2.rectangle(
-                    rgb_img, (bbox[0], bbox[1]), (bbox[2], bbox[3]), color, 6)
+                label = f'{prob * 100:.2f}% {"live" if liveness else "spoof"}'
+                cv2.rectangle(rgb_img, (bbox[0], bbox[1]), (bbox[2], bbox[3]), color, 6)
+                labelSize = cv2.getTextSize(label, cv2.FONT_HERSHEY_SIMPLEX, 0.6, 2)
+                cv2.rectangle(rgb_img, (bbox[0], bbox[1]), (bbox[0] + labelSize[0][0], bbox[1] - int(labelSize[0][1])),
+                              color, cv2.FILLED)
+                cv2.putText(rgb_img, label, (bbox[0], bbox[1]), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 0, 0), 1)
             if not writer:
                 cv2.imshow('frame', rgb_img)
             else:

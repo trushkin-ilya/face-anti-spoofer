@@ -19,11 +19,11 @@ Face anti-spoofing task solution using CASIA-SURF CeFA dataset, [FeatherNets](ht
 | Model |  Params, M | Computational complexity, MFLOPs | RGB | Depth | IR |Loss function | Optimal LR | Minimal ACER (CASIA-SURF val) | Snapshot |
 | --- | --- | ---| --- | --- | --- | --- | --- | --- | --- |
 | FeatherNet | 0.35 | 79.99 | :heavy_check_mark: | :x: | :x: | Cross-entropy | 3e-6| 0.0068 | [Download](https://drive.google.com/file/d/10bfah9AzmhoGA3SPKrr17bHmpQ9kOTAG/view?usp=sharing) |
-| FeatherNet | 0.35 | 79.99 | :heavy_check_mark: | :heavy_check_mark: | :x: | Cross-entropy | 3e-6| 0.0005 |
+| FeatherNet | 0.35 | 79.99 | :heavy_check_mark: | :heavy_check_mark: | :x: | Cross-entropy | 3e-6| 0.0005 | [Download](https://drive.google.com/file/d/1TnZonwS1dPs7lLtOjrPtb9JCDQF3u8uR/view?usp=sharing)
 | FeatherNet | 0.35 | 79.99 | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark: | Cross-entropy | 1e-7 |  0 | [Download](https://drive.google.com/file/d/1Fx6umkuQElj-3rAXJfWcDskCsKO2wxdc/view?usp=sharing)
 | FeatherNet | 0.35 | 79.99 | :heavy_check_mark: | :x: | :x: | Focal loss | 3e-6 | 0.0117 | [Download](https://drive.google.com/file/d/1Fx6umkuQElj-3rAXJfWcDskCsKO2wxdc/view?usp=sharing)
 | MobileLiteNet | 0.57 | 270.91 | :heavy_check_mark: | :x: | :x: | Cross-entropy | 3e-7 | 0.0397 | [Download](https://drive.google.com/file/d/1DU3pCwUJujoYQmg8XJXzQepNJp7SwG1Y/view?usp=sharing)
-| MobileLiteNet | 0.57 | 270.91 | :heavy_check_mark: | :heavy_check_mark: | :x: | Cross-entropy | 3e-6| 0.0029 |
+| MobileLiteNet | 0.57 | 270.91 | :heavy_check_mark: | :heavy_check_mark: | :x: | Cross-entropy | 3e-6| 0.0029 | [Download](https://drive.google.com/file/d/1HTHohYimOIKSkusrdfscznr2pDuWQePa/view?usp=sharing)
 | MobileLiteNet | 0.57 | 270.91 | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark: | Cross-entropy | 3e-6 | 0 | [Download](https://drive.google.com/file/d/14tAwhKCouix4Jgoe6XtU9WsQUJ4nIRVW/view?usp=sharing)
 | MobileLiteNet | 0.57 | 270.91 | :heavy_check_mark: | :x: | :x: | Focal loss | 3e-7| 0.0495 | [Download](https://drive.google.com/file/d/10vRtKCTO15KC5WE9xTAAJVq_fi0zHlni/view?usp=sharing)
 | ResNet18 | 13.95 | 883730 | :heavy_check_mark: | :x: | :x: | Cross-entropy | 1e-3 | 0.0304 | [Download](https://drive.google.com/file/d/1cSlpPIyAq6xwqHZe7LGq_tMQOaJHwjTU/view?usp=sharing)

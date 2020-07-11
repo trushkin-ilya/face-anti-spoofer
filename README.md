@@ -16,20 +16,20 @@ Face anti-spoofing task solution using CASIA-SURF CeFA dataset, [FeatherNets](ht
 
 
 
-| Model |  Params, M | Computational complexity, MFLOPs | RGB | Depth | IR |Loss function | Optimal LR | Minimal ACER (CASIA-SURF val) |
-| --- | --- | ---| --- | --- | --- | --- | --- | --- |
-| FeatherNet | 0.35 | 79.99 | :heavy_check_mark: | :x: | :x: | Cross-entropy | 3e-6| 0.0068 |
-| FeatherNet | 0.35 | 79.99 | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark: | Cross-entropy | 1e-7 |  0 |
-| FeatherNet | 0.35 | 79.99 | :heavy_check_mark: | :x: | :x: | Focal loss | 3e-6 | 0.0117 | 
-| MobileLiteNet | 0.57 | 270.91 | :heavy_check_mark: | :x: | :x: | Cross-entropy | 3e-7 | 0.0397 |
-| MobileLiteNet | 0.57 | 270.91 | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark: | Cross-entropy | 3e-6 | 0 |
-| MobileLiteNet | 0.57 | 270.91 | :heavy_check_mark: | :x: | :x: | Focal loss | 3e-7| 0.0495 |
-| ResNet18 | 13.95 | 883730 | :heavy_check_mark: | :x: | :x: | Cross-entropy | 1e-3 | 0.0304 |
-| ResNet18 | 13.95 | 883730 | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark: | Cross-entropy | 1e-3 | 0.0004 |
-| ResNet18 | 13.95 | 883730 | :heavy_check_mark: | :x: | :x: | Focal loss| 1e-4 | 0.03717 | 
-| ResNet18 with dropout | 13.95 | 883730 | :heavy_check_mark: | :x: | :x: | Cross-entropy | 1e-3 | 0.1244 |
-| ResNet18 with dropout | 13.95 | 883730 | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark: | Cross-entropy | 1e-3 | 0.0001 |
-| ResNet18 with dropout | 13.95 | 883730 | :heavy_check_mark: | :x: | :x: | Focal loss | 1e-4 | 0.0548 | 
+| Model |  Params, M | Computational complexity, MFLOPs | RGB | Depth | IR |Loss function | Optimal LR | Minimal ACER (CASIA-SURF val) | Snapshot |
+| --- | --- | ---| --- | --- | --- | --- | --- | --- | --- |
+| FeatherNet | 0.35 | 79.99 | :heavy_check_mark: | :x: | :x: | Cross-entropy | 3e-6| 0.0068 | [Download](https://drive.google.com/file/d/10bfah9AzmhoGA3SPKrr17bHmpQ9kOTAG/view?usp=sharing) |
+| FeatherNet | 0.35 | 79.99 | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark: | Cross-entropy | 1e-7 |  0 | [Download](https://drive.google.com/file/d/1Fx6umkuQElj-3rAXJfWcDskCsKO2wxdc/view?usp=sharing)
+| FeatherNet | 0.35 | 79.99 | :heavy_check_mark: | :x: | :x: | Focal loss | 3e-6 | 0.0117 | [Download](https://drive.google.com/file/d/1Fx6umkuQElj-3rAXJfWcDskCsKO2wxdc/view?usp=sharing)
+| MobileLiteNet | 0.57 | 270.91 | :heavy_check_mark: | :x: | :x: | Cross-entropy | 3e-7 | 0.0397 | [Download](https://drive.google.com/file/d/1DU3pCwUJujoYQmg8XJXzQepNJp7SwG1Y/view?usp=sharing)
+| MobileLiteNet | 0.57 | 270.91 | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark: | Cross-entropy | 3e-6 | 0 | [Download](https://drive.google.com/file/d/14tAwhKCouix4Jgoe6XtU9WsQUJ4nIRVW/view?usp=sharing)
+| MobileLiteNet | 0.57 | 270.91 | :heavy_check_mark: | :x: | :x: | Focal loss | 3e-7| 0.0495 | [Download](https://drive.google.com/file/d/10vRtKCTO15KC5WE9xTAAJVq_fi0zHlni/view?usp=sharing)
+| ResNet18 | 13.95 | 883730 | :heavy_check_mark: | :x: | :x: | Cross-entropy | 1e-3 | 0.0304 | [Download](https://drive.google.com/file/d/1cSlpPIyAq6xwqHZe7LGq_tMQOaJHwjTU/view?usp=sharing)
+| ResNet18 | 13.95 | 883730 | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark: | Cross-entropy | 1e-3 | 0.0004 | [Download](https://drive.google.com/file/d/1jT7PaxDIED3yf8xtZSaU_QGgK4vAS8lq/view?usp=sharing)
+| ResNet18 | 13.95 | 883730 | :heavy_check_mark: | :x: | :x: | Focal loss| 1e-4 | 0.03717 | [Download](https://drive.google.com/file/d/1KUnfBUggjWP3TzFc7IrsE0UopV-8hYRx/view?usp=sharing)
+| ResNet18 with dropout | 13.95 | 883730 | :heavy_check_mark: | :x: | :x: | Cross-entropy | 1e-3 | 0.1244 | [Download](https://drive.google.com/file/d/1eSKpZi6EsNnj69CRq4HMSOpwu5PnFkM5/view?usp=sharing)
+| ResNet18 with dropout | 13.95 | 883730 | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark: | Cross-entropy | 1e-3 | 0.0001 | [Download](https://drive.google.com/file/d/1WnbgnPjeVCfR_2tUEJ3R8ThulKaXQ7tF/view?usp=sharing)
+| ResNet18 with dropout | 13.95 | 883730 | :heavy_check_mark: | :x: | :x: | Focal loss | 1e-4 | 0.0548 | [Download](https://drive.google.com/file/d/1nsT7aBzzeqseWd6c1eZwKc_t3XkMXiVV/view?usp=sharing)
 
 [TensorBoard](https://tensorboard.dev/experiment/SoIKSMcbRniYID003q5glw/#scalars)
 

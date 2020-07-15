@@ -46,7 +46,6 @@ if __name__ == '__main__':
     argparser.add_argument('--val_batch_size', type=int, default=1)
     argparser.add_argument('--eval_every', type=int, default=1)
     argparser.add_argument('--save_path', type=str, default='checkpoints')
-    argparser.add_argument('--num_classes', type=int, default=2)
     argparser.add_argument('--save_every', type=int, default=1)
     argparser.add_argument('--num_workers', type=int, default=0)
     argparser.add_argument('--data_dir', type=str, required=True)
@@ -54,7 +53,7 @@ if __name__ == '__main__':
     config = yaml.load(open(args.config_path), Loader=yaml.FullLoader)
 
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
-    model = getattr(models, config['model'])(num_classes=args.num_classes)
+    model = getattr(models, config['model'])(num_classes=config['num_classes'])
 
     val_data = CasiaSurfDataset(args.protocol, dir=args.data_dir, mode='dev', depth=config['depth'], ir=config['ir'],
                                 transform=ValidationTransform())

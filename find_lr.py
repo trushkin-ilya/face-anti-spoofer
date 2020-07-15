@@ -54,7 +54,6 @@ if __name__ == '__main__':
     argparser.add_argument('--config_path', required=True, type=str)
     argparser.add_argument('--optimizer', default="Adam", type=str)
     argparser.add_argument('--loss_fn', default="CrossEntropyLoss", type=str)
-    argparser.add_argument('--num_classes', type=int, default=2)
     args = argparser.parse_args()
     config = yaml.load(open(args.config_path), Loader=yaml.FullLoader)
 
@@ -65,7 +64,7 @@ if __name__ == '__main__':
         dataset, sampler=data.sampler.RandomSampler(dataset), batch_size=32)
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
     plt.figure(figsize=(21, 9))
-    model = getattr(models, config['model'])(num_classes=args.num_classes)
+    model = getattr(models, config['model'])(num_classes=config['num_classes'])
     optimizer = getattr(optimizers, args.optimizer)(model.parameters())
     criterion = getattr(losses, args.loss_fn)()
     model = model.to(device)

@@ -77,7 +77,6 @@ if __name__ == '__main__':
                            default=os.path.join('data', 'CASIA_SURF'))
     argparser.add_argument('--checkpoint', type=str, required=True)
     argparser.add_argument('--config-path', type=str, required=True)
-    argparser.add_argument('--num_classes', type=int, default=2)
     argparser.add_argument('--batch_size', type=int, default=1)
     argparser.add_argument('--visualize', type=bool, default=False)
     argparser.add_argument('--num_workers', type=int, default=0)

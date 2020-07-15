@@ -6,3 +6,4 @@ optimizer:
 lr_scheduler: ReduceLROnPlateau
 depth: True
 ir: True
+num_classes: 2

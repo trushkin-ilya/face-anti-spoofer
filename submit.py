@@ -71,7 +71,6 @@ The final merged file (for submission) contains a total of 7,200 lines. Each lin
     argparser = argparse.ArgumentParser()
     argparser.add_argument('--config_path', type=str, required=True)
     argparser.add_argument('--checkpoint', type=str, required=True)
-    argparser.add_argument('--num_classes', type=int, default=2)
     argparser.add_argument('--batch_size', type=int, default=1)
     argparser.add_argument('--output', type=str, default='submission.txt')
     argparser.add_argument('--num_workers', type=int, default=0)
@@ -79,7 +78,7 @@ The final merged file (for submission) contains a total of 7,200 lines. Each lin
     args = argparser.parse_args()
     config = yaml.load(args.config_path, Loader=yaml.FullLoader)
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
-    model = getattr(models, config['model'])(num_classes=args.num_classes, device=device)
+    model = getattr(models, config['model'])(num_classes=config['num_classes'], device=device)
     model.load_state_dict(torch.load(config['model'], map_location=device))
     model = model.to(device)
     for protocol in [1, 2, 3]:

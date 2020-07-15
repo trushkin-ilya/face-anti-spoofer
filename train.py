@@ -50,19 +50,17 @@ if __name__ == '__main__':
     argparser.add_argument('--save_every', type=int, default=1)
     argparser.add_argument('--num_workers', type=int, default=0)
     argparser.add_argument('--data_dir', type=str, required=True)
-    argparser.add_argument('--depth', type=bool, default=False)
-    argparser.add_argument('--ir', type=bool, default=False)
     args = argparser.parse_args()
     config = yaml.load(open(args.config_path), Loader=yaml.FullLoader)
 
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
     model = getattr(models, config['model'])(num_classes=args.num_classes)
 
-    val_data = CasiaSurfDataset(args.protocol, dir=args.data_dir, mode='dev', depth=args.depth, ir=args.ir,
+    val_data = CasiaSurfDataset(args.protocol, dir=args.data_dir, mode='dev', depth=config['depth'], ir=config['ir'],
                                 transform=ValidationTransform())
 
     train_data = torch.utils.data.ConcatDataset(
-        [CasiaSurfDataset(protocol, dir=args.data_dir, mode='train', depth=args.depth, ir=args.ir,
+        [CasiaSurfDataset(protocol, dir=args.data_dir, mode='train', depth=config['depth'], ir=config['ir'],
                           transform=TrainTransform()) for protocol in [1, 2, 3]])
 
     train_loader = data.DataLoader(train_data, batch_size=args.train_batch_size, num_workers=args.num_workers,

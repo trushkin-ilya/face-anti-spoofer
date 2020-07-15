@@ -62,7 +62,7 @@ def main(args):
     model.eval()
     with torch.no_grad():
         dataset = CasiaSurfDataset(
-            args.protocol, mode='dev', dir=args.data_dir, transform=ValidationTransform(), depth=args.depth, ir=args.ir)
+            args.protocol, mode='dev', dir=args.data_dir, transform=ValidationTransform(), depth=config['depth'], ir=config['ir'])
         dataloader = data.DataLoader(
             dataset, batch_size=args.batch_size, num_workers=args.num_workers)
 
@@ -82,8 +82,6 @@ if __name__ == '__main__':
     argparser.add_argument('--visualize', type=bool, default=False)
     argparser.add_argument('--num_workers', type=int, default=0)
     argparser.add_argument('--video_path', type=str)
-    argparser.add_argument('--depth', type=bool, default=False)
-    argparser.add_argument('--ir', type=bool, default=False)
     args = argparser.parse_args()
     config = yaml.load(open(args.config_path), Loader=yaml.FullLoader)
     args = Namespace(**vars(args), **config)

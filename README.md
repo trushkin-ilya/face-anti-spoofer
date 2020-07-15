@@ -63,7 +63,6 @@ python train.py --protocol PROTOCOL --config-path CONFIG_PATH --data_dir DATA_DI
                 [--epochs 10] [--checkpoint ''] [--train_batch_size 1]
                 [--val_batch_size 1] [--eval_every 1] [--save_path checkpoints]
                 [--num_classes NUM_CLASSES] [--save_every 1] [--num_workers 0]
-                [--depth False] [--ir False]
 ```
 Protocol must be either 1, 2 or 3. It determines CASIA-SURF benchmark sub-protocol of Protocol 4.
 
@@ -75,15 +74,13 @@ Protocol must be either 1, 2 or 3. It determines CASIA-SURF benchmark sub-protoc
 python test.py --protocol PROTOCOL --checkpoint CHECKPOINT --config-path CONFIG_PATH 
                [--data-dir DATA_DIR] [--num_classes NUM_CLASSES] [--batch_size BATCH_SIZE]
                [--visualize VISUALIZE] [--num_workers NUM_WORKERS] [--video_path VIDEO_PATH]
-               [--depth DEPTH] [--ir IR]
 ```
 Protocol must be either 1, 2 or 3. It determines CASIA-SURF benchmark sub-protocol of Protocol 4.
 
 ### Demo with Intel® RealSense™ camera
 #### Running
 ```
-python realsense_demo.py --video-path VIDEO_PATH --config-path CONFIG_PATH [--depth DEPTH]
-                         [--ir IR] [--num_classes NUM_CLASSES]
+python realsense_demo.py --video-path VIDEO_PATH --config-path CONFIG_PATH  [--num_classes NUM_CLASSES]
 ```
 **WARNING:** Current evaluation for RealSense cameras was developed only for legacy devices which supported by [pyrealsense](https://github.com/toinsson/pyrealsense) library. Everything works fine for F200.
 #### Demo
@@ -97,5 +94,5 @@ Submission is made for Face Anti-spoofing Detection Challenge at CVPR2020.
 ```
 python submit.py --model1_path MODEL1_PATH --model2_path MODEL2_PATH --model3_path MODEL3_PATH 
                  [--num_classes 2] [--batch_size 1] [--output submission.txt]
-                 [--num_workers 0] [--depth False] [--ir False]
+                 [--num_workers 0] 
 ```

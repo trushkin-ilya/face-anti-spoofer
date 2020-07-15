@@ -4,3 +4,5 @@ optimizer:
   class: Adam
   lr: 1e-4
 lr_scheduler: ReduceLROnPlateau
+depth: True
+ir: True

@@ -8,6 +8,7 @@ import losses
 import optimizers
 import math
 from tqdm import tqdm
+import yaml
 
 from transforms import TrainTransform
 
@@ -50,22 +51,21 @@ def find_lr(loader, net, optimizer, criterion, init_value=3e-10, final_value=3.,
 
 if __name__ == '__main__':
     argparser = ArgumentParser()
-    argparser.add_argument('--model', required=True, type=str)
+    argparser.add_argument('--config_path', required=True, type=str)
     argparser.add_argument('--optimizer', default="Adam", type=str)
     argparser.add_argument('--loss_fn', default="CrossEntropyLoss", type=str)
     argparser.add_argument('--num_classes', type=int, default=2)
-    argparser.add_argument('--depth', type=bool, default=False)
-    argparser.add_argument('--ir', type=bool, default=False)
     args = argparser.parse_args()
+    config = yaml.load(open(args.config_path), Loader=yaml.FullLoader)
 
     dataset = torch.utils.data.ConcatDataset(
-        [CasiaSurfDataset(protocol, mode='train', depth=args.depth, ir=args.ir,
+        [CasiaSurfDataset(protocol, mode='train', depth=config['depth'], ir=config['ir'],
                           transform=TrainTransform()) for protocol in [1, 2, 3]])
     dataloader = data.DataLoader(
         dataset, sampler=data.sampler.RandomSampler(dataset), batch_size=32)
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
     plt.figure(figsize=(21, 9))
-    model = getattr(models, args.model)(num_classes=args.num_classes)
+    model = getattr(models, config['model'])(num_classes=args.num_classes)
     optimizer = getattr(optimizers, args.optimizer)(model.parameters())
     criterion = getattr(losses, args.loss_fn)()
     model = model.to(device)

@@ -52,8 +52,6 @@ def find_lr(loader, net, optimizer, criterion, init_value=3e-10, final_value=3.,
 if __name__ == '__main__':
     argparser = ArgumentParser()
     argparser.add_argument('--config_path', required=True, type=str)
-    argparser.add_argument('--optimizer', default="Adam", type=str)
-    argparser.add_argument('--loss_fn', default="CrossEntropyLoss", type=str)
     args = argparser.parse_args()
     config = yaml.load(open(args.config_path), Loader=yaml.FullLoader)
 
@@ -65,8 +63,8 @@ if __name__ == '__main__':
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
     plt.figure(figsize=(21, 9))
     model = getattr(models, config['model'])(num_classes=config['num_classes'])
-    optimizer = getattr(optimizers, args.optimizer)(model.parameters())
-    criterion = getattr(losses, args.loss_fn)()
+    optimizer = getattr(optimizers, config['optimizer'])(model.parameters())
+    criterion = getattr(losses, config['loss_fn'])()
     model = model.to(device)
     model.train()
     log_lrs, losses = find_lr(dataloader, model, optimizer, criterion)

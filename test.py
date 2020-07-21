@@ -55,8 +55,8 @@ def evaluate(dataloader: data.DataLoader, model: nn.Module, visualize: bool = Fa
     return apcer, bpcer, acer
 
 
-def main(args):
-    model = getattr(models, args.model)(num_classes=args.num_classes)
+def main(args, config):
+    model = getattr(models, config['model'])(num_classes=config['num_classes'])
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
     model.load_state_dict(torch.load(args.checkpoint, map_location=device))
     model.eval()
@@ -80,8 +80,6 @@ if __name__ == '__main__':
     argparser.add_argument('--batch_size', type=int, default=1)
     argparser.add_argument('--visualize', type=bool, default=False)
     argparser.add_argument('--num_workers', type=int, default=0)
-    argparser.add_argument('--video_path', type=str)
     args = argparser.parse_args()
     config = yaml.load(open(args.config_path), Loader=yaml.FullLoader)
-    args = Namespace(**vars(args), **config)
-    main(args)
+    main(args, config)

@@ -1,0 +1,9 @@
+model: resnet18
+loss_fn: CrossEntropyLoss
+optimizer:
+  class: Adam
+  lr: 1e-3
+lr_scheduler: ReduceLROnPlateau
+depth: False
+ir: False
+num_classes: 2

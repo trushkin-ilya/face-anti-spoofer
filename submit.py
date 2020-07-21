@@ -3,12 +3,13 @@ import numpy as np
 import pandas as pd
 import torch
 import torch.nn.functional as F
+import yaml
 
 from tqdm import tqdm
-from torchvision import transforms
 from baseline.datasets import CasiaSurfDataset
 from torch.utils import data
-from models import Ensemble
+import models
+from transforms import ValidationTransform
 
 if __name__ == '__main__':
     '''
@@ -68,34 +69,24 @@ The final merged file (for submission) contains a total of 7,200 lines. Each lin
                                  ......
     '''
     argparser = argparse.ArgumentParser()
-    argparser.add_argument('--model1_path', type=str, required=True)
-    argparser.add_argument('--model2_path', type=str, required=True)
-    argparser.add_argument('--model3_path', type=str, required=True)
-    argparser.add_argument('--num_classes', type=int, default=2)
+    argparser.add_argument('--config_path', type=str, required=True)
+    argparser.add_argument('--checkpoint', type=str, required=True)
     argparser.add_argument('--batch_size', type=int, default=1)
     argparser.add_argument('--output', type=str, default='submission.txt')
     argparser.add_argument('--num_workers', type=int, default=0)
 
-    argparser.add_argument('--depth', type=bool, default=False)
-    argparser.add_argument('--ir', type=bool, default=False)
     args = argparser.parse_args()
-
+    config = yaml.load(args.config_path, Loader=yaml.FullLoader)
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
-    model = Ensemble(num_classes=args.num_classes, device=device)
-
+    model = getattr(models, config['model'])(num_classes=config['num_classes'], device=device)
+    model.load_state_dict(torch.load(config['model'], map_location=device))
+    model = model.to(device)
     for protocol in [1, 2, 3]:
-        model.load_state_dict(torch.load(
-            getattr(args, f'model{protocol}_path'), map_location=device))
-        model = model.to(device)
         print(f"Evaluating protocol {protocol}...")
         model.eval()
         for mode in ['dev', 'test']:
-            dataset = CasiaSurfDataset(protocol, mode=mode, transform=transforms.Compose([
-                transforms.Resize(256),
-                transforms.RandomCrop(224),
-                transforms.RandomHorizontalFlip(),
-                transforms.ToTensor()
-            ]), depth=args.depth, ir=args.ir)
+            dataset = CasiaSurfDataset(protocol, mode=mode, transform=ValidationTransform(), depth=config['depth'],
+                                       ir=config['ir'])
             dataloader = data.DataLoader(
                 dataset, batch_size=args.batch_size, num_workers=args.num_workers)
             df = pd.DataFrame(columns=['prob', 'video_id'], index=np.arange(

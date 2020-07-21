@@ -20,8 +20,8 @@ def convert_z16_to_bgr(frame):
 
     f = hist[frame[non_zeros]] * 255 / hist[0xFFFF]
     rgb_frame[non_zeros, 0] = 255 - f
-    rgb_frame[non_zeros, 1] = 0
-    rgb_frame[non_zeros, 2] = f
+    rgb_frame[non_zeros, 1] = 255-f
+    rgb_frame[non_zeros, 2] = 255-f
     rgb_frame[zeros, 0] = 20
     rgb_frame[zeros, 1] = 5
     rgb_frame[zeros, 2] = 0
@@ -45,19 +45,17 @@ def save_camera_data_to_files(device_id=0, rgb: bool = True, depth: bool = True,
         rgb_writer, depth_writer, ir_writer = None, None, None
         fourcc = cv2.VideoWriter_fourcc(*'mp4v')
         if rgb:
-            rgb_stream = ColorStream(width=1280, height=720)
+            rgb_stream = ColorStream()
             streams.append(rgb_stream)
             rgb_writer = cv2.VideoWriter(f'{outfile_pattern}_rgb.mp4', fourcc, 30,
                                          (rgb_stream.width, rgb_stream.height))
         if depth:
             depth_stream = DepthStream()
             dac_stream = DACStream()
-            cad_stream = CADStream()
             streams.append(depth_stream)
             streams.append(dac_stream)
-            streams.append(cad_stream)
             depth_writer = cv2.VideoWriter(f'{outfile_pattern}_depth.mp4', fourcc, 30,
-                                           (depth_stream.width, depth_stream.height), False)
+                                           (depth_stream.width, depth_stream.height))
         if ir:
             ir_stream = InfraredStream()
             streams.append(ir_stream)
@@ -70,21 +68,22 @@ def save_camera_data_to_files(device_id=0, rgb: bool = True, depth: bool = True,
                     frame = cv2.cvtColor(cam.color, cv2.COLOR_RGB2BGR)
                     rgb_writer.write(frame)
                 if depth_writer:
-                    frame = cam.dac
-                    depth_writer.write(frame)
+                    dac = convert_z16_to_bgr(cam.dac)
+                    depth_writer.write(dac)
                 if ir_writer:
                     ir_writer.write(cv2.GaussianBlur(cam.infrared, (5, 5), 0))
     for writer in [rgb_writer, depth_writer, ir_writer]:
         if writer:
             writer.release()
+    cv2.destroyAllWindows()
 
 
 if __name__ == '__main__':
     argparser = argparse.ArgumentParser()
     argparser.add_argument('--device-id', type=int, default=0)
     argparser.add_argument('--rgb', type=bool, default=True)
-    argparser.add_argument('--depth', type=bool, default=False)
-    argparser.add_argument('--ir', type=bool, default=True)
+    argparser.add_argument('--depth', type=bool, default=True)
+    argparser.add_argument('--ir', type=bool, default=False)
     argparser.add_argument('--frames', type=int, default=150)
     args = argparser.parse_args()
 

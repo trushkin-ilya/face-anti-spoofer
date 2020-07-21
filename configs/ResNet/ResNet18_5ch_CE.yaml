@@ -1,0 +1,9 @@
+model: resnet18_5ch
+loss_fn: CrossEntropyLoss
+optimizer:
+  class: Adam
+  lr: 1e-3
+lr_scheduler: ReduceLROnPlateau
+depth: True
+ir: True
+num_classes: 2

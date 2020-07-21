@@ -1,0 +1,9 @@
+model: FeatherNetA
+loss_fn: CrossEntropyLoss
+optimizer:
+  class: Adam
+  lr: 3e-6
+lr_scheduler: ReduceLROnPlateau
+depth: False
+ir: False
+num_classes: 2

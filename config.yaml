@@ -1,6 +1,0 @@
-model: FeatherNetA
-loss_fn: FocalLoss
-optimizer:
-  class: Adam
-  lr: 3e-6
-lr_scheduler: ReduceLROnPlateau

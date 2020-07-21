@@ -5,10 +5,10 @@ import numpy as np
 import models, optimizers, losses
 import yaml
 
-from baseline.datasets import CasiaSurfDataset, NonZeroCrop
-from torchvision import transforms
+from baseline.datasets import CasiaSurfDataset
 from torch.utils import tensorboard, data
 from test import evaluate
+from transforms import ValidationTransform, TrainTransform
 
 
 def train(model, dataloader, loss_fn, optimizer, callback):
@@ -39,39 +39,28 @@ def validation_callback(model, loader, writer, epoch):
 if __name__ == '__main__':
     argparser = argparse.ArgumentParser()
     argparser.add_argument('--protocol', type=int, required=True)
+    argparser.add_argument('--config-path', type=str, required=True)
     argparser.add_argument('--epochs', type=int, default=10)
     argparser.add_argument('--checkpoint', type=str)
     argparser.add_argument('--train_batch_size', type=int, default=1)
     argparser.add_argument('--val_batch_size', type=int, default=1)
     argparser.add_argument('--eval_every', type=int, default=1)
     argparser.add_argument('--save_path', type=str, default='checkpoints')
-    argparser.add_argument('--num_classes', type=int, default=2)
     argparser.add_argument('--save_every', type=int, default=1)
     argparser.add_argument('--num_workers', type=int, default=0)
     argparser.add_argument('--data_dir', type=str, required=True)
-    argparser.add_argument('--depth', type=bool, default=False)
-    argparser.add_argument('--ir', type=bool, default=False)
     args = argparser.parse_args()
-    config = yaml.load(open('config.yaml'), Loader=yaml.FullLoader)
+    config = yaml.load(open(args.config_path), Loader=yaml.FullLoader)
 
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
-    model = getattr(models, config['model'])(num_classes=args.num_classes)
+    model = getattr(models, config['model'])(num_classes=config['num_classes'])
 
-    val_data = CasiaSurfDataset(args.protocol, dir=args.data_dir, mode='dev', depth=args.depth, ir=args.ir,
-                                transform=transforms.Compose([
-                                    NonZeroCrop(),
-                                    transforms.Resize(256),
-                                    transforms.CenterCrop(224),
-                                    transforms.ToTensor()]))
+    val_data = CasiaSurfDataset(args.protocol, dir=args.data_dir, mode='dev', depth=config['depth'], ir=config['ir'],
+                                transform=ValidationTransform())
 
     train_data = torch.utils.data.ConcatDataset(
-        [CasiaSurfDataset(protocol, dir=args.data_dir, mode='train', depth=args.depth, ir=args.ir,
-                          transform=transforms.Compose([
-                              NonZeroCrop(),
-                              transforms.Resize(256),
-                              transforms.RandomCrop(224),
-                              transforms.RandomHorizontalFlip(),
-                              transforms.ToTensor()])) for protocol in [1, 2, 3]])
+        [CasiaSurfDataset(protocol, dir=args.data_dir, mode='train', depth=config['depth'], ir=config['ir'],
+                          transform=TrainTransform()) for protocol in [1, 2, 3]])
 
     train_loader = data.DataLoader(train_data, batch_size=args.train_batch_size, num_workers=args.num_workers,
                                    sampler=data.RandomSampler(train_data))

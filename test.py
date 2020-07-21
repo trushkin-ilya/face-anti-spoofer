@@ -1,6 +1,5 @@
-from baseline.datasets import CasiaSurfDataset, NonZeroCrop
+from baseline.datasets import CasiaSurfDataset
 from tqdm import tqdm
-from torchvision import transforms
 import models
 from torch.utils import data
 from torch import nn
@@ -11,6 +10,8 @@ import numpy as np
 import torch
 import os
 import yaml
+
+from transforms import ValidationTransform
 
 
 def evaluate(dataloader: data.DataLoader, model: nn.Module, visualize: bool = False):
@@ -54,29 +55,14 @@ def evaluate(dataloader: data.DataLoader, model: nn.Module, visualize: bool = Fa
     return apcer, bpcer, acer
 
 
-def main(args):
-    model = getattr(models, args.model)(num_classes=args.num_classes)
+def main(args, config):
+    model = getattr(models, config['model'])(num_classes=config['num_classes'])
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
     model.load_state_dict(torch.load(args.checkpoint, map_location=device))
-    transform = transforms.Compose([
-        NonZeroCrop(),
-        transforms.Resize(256),
-        transforms.CenterCrop(224),
-        transforms.ToTensor()
-    ])
     model.eval()
     with torch.no_grad():
-        if args.video_path:
-            from realsense.eval import RealSenseVideoEvaluator
-            evaluator = RealSenseVideoEvaluator(model, transform)
-            if args.depth and args.ir:
-                evaluator.process_5ch_video(args.video_path, 'result.mp4')
-            else:
-                evaluator.process_rgb_video(args.video_path, 'result.mp4')
-            return
-
         dataset = CasiaSurfDataset(
-            args.protocol, mode='dev', dir=args.data_dir, transform=transform, depth=args.depth, ir=args.ir)
+            args.protocol, mode='dev', dir=args.data_dir, transform=ValidationTransform(), depth=config['depth'], ir=config['ir'])
         dataloader = data.DataLoader(
             dataset, batch_size=args.batch_size, num_workers=args.num_workers)
 
@@ -90,14 +76,10 @@ if __name__ == '__main__':
     argparser.add_argument('--data-dir', type=str,
                            default=os.path.join('data', 'CASIA_SURF'))
     argparser.add_argument('--checkpoint', type=str, required=True)
-    argparser.add_argument('--num_classes', type=int, default=2)
+    argparser.add_argument('--config-path', type=str, required=True)
     argparser.add_argument('--batch_size', type=int, default=1)
     argparser.add_argument('--visualize', type=bool, default=False)
     argparser.add_argument('--num_workers', type=int, default=0)
-    argparser.add_argument('--video_path', type=str)
-    argparser.add_argument('--depth', type=bool, default=False)
-    argparser.add_argument('--ir', type=bool, default=False)
     args = argparser.parse_args()
-    config = yaml.load(open('config.yaml'), Loader=yaml.FullLoader)
-    args = Namespace(**vars(args), **config)
-    main(args)
+    config = yaml.load(open(args.config_path), Loader=yaml.FullLoader)
+    main(args, config)

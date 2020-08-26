@@ -25,7 +25,7 @@ Face anti-spoofing task solution using CASIA-SURF CeFA dataset, [FeatherNets](ht
 | MobileLiteNet | 0.57 | 270.91 | :heavy_check_mark: | :x: | :x: | Cross-entropy | 3e-7 | 0.0397 | [Download](https://drive.google.com/file/d/1DU3pCwUJujoYQmg8XJXzQepNJp7SwG1Y/view?usp=sharing)
 | MobileLiteNet | 0.57 | 270.91 | :heavy_check_mark: | :heavy_check_mark: | :x: | Cross-entropy | 3e-6| 0.0029 | [Download](https://drive.google.com/file/d/1HTHohYimOIKSkusrdfscznr2pDuWQePa/view?usp=sharing)
 | MobileLiteNet | 0.57 | 270.91 | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark: | Cross-entropy | 3e-6 | 0 | [Download](https://drive.google.com/file/d/14tAwhKCouix4Jgoe6XtU9WsQUJ4nIRVW/view?usp=sharing)
-| MobileLiteNet | 0.57 | 270.91 | :heavy_check_mark: | :x: | :x: | Focal loss | 3e-7| 0.0495 | [Download](https://drive.google.com/file/d/10vRtKCTO15KC5WE9xTAAJVq_fi0zHlni/view?usp=sharing)
+| MobileLiteNet | 0.57 | 270.91 | :heavy_check_mark: | :x: | :x: | Focal loss | 3e-7| 0.0495 | [Download](https://drive.google.com/file/d/1VBEYg-6Gs5cSiQadlvUbxNqRw7jDQGqk/view?usp=sharing)
 | ResNet18 | 13.95 | 883730 | :heavy_check_mark: | :x: | :x: | Cross-entropy | 1e-3 | 0.0304 | [Download](https://drive.google.com/file/d/1cSlpPIyAq6xwqHZe7LGq_tMQOaJHwjTU/view?usp=sharing)
 | ResNet18 | 13.95 | 883730 | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark: | Cross-entropy | 1e-3 | 0.0004 | [Download](https://drive.google.com/file/d/1jT7PaxDIED3yf8xtZSaU_QGgK4vAS8lq/view?usp=sharing)
 | ResNet18 | 13.95 | 883730 | :heavy_check_mark: | :x: | :x: | Focal loss| 1e-4 | 0.03717 | [Download](https://drive.google.com/file/d/1KUnfBUggjWP3TzFc7IrsE0UopV-8hYRx/view?usp=sharing)

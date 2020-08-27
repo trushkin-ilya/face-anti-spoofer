@@ -30,7 +30,7 @@ Face anti-spoofing task solution using CASIA-SURF CeFA dataset, [FeatherNets](ht
 | ResNet18 | 13.95 | 883730 | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark: | Cross-entropy | 1e-3 | 0.0004 | [Download](https://drive.google.com/file/d/1Ap0e8PiIFdE49v9ihzsdv4TxubANeW7G/view?usp=sharing)
 | ResNet18 | 13.95 | 883730 | :heavy_check_mark: | :x: | :x: | Focal loss| 1e-4 | 0.03717 | [Download](https://drive.google.com/file/d/1KUnfBUggjWP3TzFc7IrsE0UopV-8hYRx/view?usp=sharing)
 | ResNet18 with dropout | 13.95 | 883730 | :heavy_check_mark: | :x: | :x: | Cross-entropy | 1e-3 | 0.1244 | [Download](https://drive.google.com/file/d/1eSKpZi6EsNnj69CRq4HMSOpwu5PnFkM5/view?usp=sharing)
-| ResNet18 with dropout | 13.95 | 883730 | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark: | Cross-entropy | 1e-3 | 0.0001 | [Download](https://drive.google.com/file/d/1WnbgnPjeVCfR_2tUEJ3R8ThulKaXQ7tF/view?usp=sharing)
+| ResNet18 with dropout | 13.95 | 883730 | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark: | Cross-entropy | 1e-3 | 0.0001 | [Download](https://drive.google.com/file/d/1nbQAqYrToPTkRSB8NIwnJWYlu6gHF2tU/view?usp=sharing)
 | ResNet18 with dropout | 13.95 | 883730 | :heavy_check_mark: | :x: | :x: | Focal loss | 1e-4 | 0.0548 | [Download](https://drive.google.com/file/d/1nsT7aBzzeqseWd6c1eZwKc_t3XkMXiVV/view?usp=sharing)
 
 [TensorBoard](https://tensorboard.dev/experiment/SoIKSMcbRniYID003q5glw/#scalars)

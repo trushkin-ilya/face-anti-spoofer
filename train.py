@@ -14,6 +14,7 @@ from transforms import ValidationTransform, TrainTransform
 def train(model, dataloader, loss_fn, optimizer, callback):
     model.train()
     for i, batch in enumerate(dataloader):
+        optimizer.zero_grad()
         images, labels = batch
         labels = torch.LongTensor(labels)
         images, labels = images.to(device), labels.to(device)
